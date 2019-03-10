@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 //Allows us to use UI.
@@ -10,7 +12,10 @@ namespace Scripts {
         public float restartLevelDelay = 1f; //Delay time in seconds to restart level.
         public int pointsPerFood = 10; //Number of points to add to player food points when picking up a food object.
         public int pointsPerSoda = 20; //Number of points to add to player food points when picking up a soda object.
-        public int wallDamage = 1; //How much damage a player does to a wall when chopping it.
+
+        [FormerlySerializedAs("wallDamage")]
+        public int damage = 1; //How much damage a player does to a wall when chopping it.
+
         public Text foodText; //UI Text to display current player food total.
         public AudioClip moveSound1; //1 of 2 Audio clips to play when player moves.
         public AudioClip moveSound2; //2 of 2 Audio clips to play when player moves.
@@ -141,12 +146,20 @@ namespace Scripts {
 
         //OnCantMove overrides the abstract function OnCantMove in MovingObject.
         //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-        protected override void OnCantMove<T>(T component) {
-            //Set hitWall to equal the component passed in as a parameter.
-            var hitWall = component as Wall;
-
-            //Call the DamageWall function of the Wall we are hitting.
-            if (hitWall != null) hitWall.DamageWall(wallDamage);
+        protected override void OnCantMove<T>([NotNull] T component) {
+            switch (component) {
+                case Wall hitWall:
+                    print("Clear my path.");
+                    //Set hitWall to equal the component passed in as a parameter.
+                    //Call the DamageWall function of the Wall we are hitting.
+                    hitWall.DamageWall(damage);
+                    break;
+                case Enemy enemy:
+                    print("Kill!");
+                    // TODO Chao Deng: Kill enemy
+                    enemy.DamageEnemy(damage);
+                    break;
+            }
 
             //Set the attack trigger of the player's animation controller in order to play the player's attack animation.
             _animator.SetTrigger(PlayerChop);
