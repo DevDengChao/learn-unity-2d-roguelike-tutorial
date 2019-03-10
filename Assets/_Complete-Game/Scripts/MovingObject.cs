@@ -43,21 +43,18 @@ namespace Scripts {
             _boxCollider.enabled = true;
 
             //Check if anything was hit
-            if (hit.transform == null) {
-                //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
-                StartCoroutine(SmoothMovement(end));
+            if (hit.transform != null) return false; //If something was hit, return false, Move was unsuccessful.
 
-                //Return true to say that Move was successful
-                return true;
-            }
+            //If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
+            StartCoroutine(SmoothMovement(end));
 
-            //If something was hit, return false, Move was unsuccesful.
-            return false;
+            //Return true to say that Move was successful
+            return true;
         }
 
 
         //Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
-        protected IEnumerator SmoothMovement(Vector3 end) {
+        private IEnumerator SmoothMovement(Vector3 end) {
             //Calculate the remaining distance to move based on the square magnitude of the difference between current position and end parameter. 
             //Square magnitude is used instead of magnitude because it's computationally cheaper.
             var sqrRemainingDistance = (transform.position - end).sqrMagnitude;
@@ -65,10 +62,10 @@ namespace Scripts {
             //While that distance is greater than a very small amount (Epsilon, almost zero):
             while (sqrRemainingDistance > float.Epsilon) {
                 //Find a new position proportionally closer to the end, based on the moveTime
-                var newPostion = Vector3.MoveTowards(_rb2D.position, end, _inverseMoveTime * Time.deltaTime);
+                var newPosition = Vector3.MoveTowards(_rb2D.position, end, _inverseMoveTime * Time.deltaTime);
 
                 //Call MovePosition on attached Rigidbody2D and move it to the calculated position.
-                _rb2D.MovePosition(newPostion);
+                _rb2D.MovePosition(newPosition);
 
                 //Recalculate the remaining distance after moving.
                 sqrRemainingDistance = (transform.position - end).sqrMagnitude;
@@ -84,10 +81,9 @@ namespace Scripts {
         protected virtual void AttemptMove<T>(int xDir, int yDir)
             where T : Component {
             //Hit will store whatever our linecast hits when Move is called.
-            RaycastHit2D hit;
 
             //Set canMove to true if Move was successful, false if failed.
-            var canMove = Move(xDir, yDir, out hit);
+            var canMove = Move(xDir, yDir, out var hit);
 
             //Check if nothing was hit by linecast
             if (hit.transform == null)
