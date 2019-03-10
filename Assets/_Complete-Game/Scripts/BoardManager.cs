@@ -124,8 +124,11 @@ namespace Scripts {
             //Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
             LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount);
 
+
             //Instantiate the exit tile in the upper right hand corner of our game board
-            Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
+            //Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
+            //Instantiate the exit tile in random place of our game board
+            LayoutObjectAtRandom(new[] {exit}, 1, 1);
         }
 
         // Using Serializable allows us to embed a class with sub properties in the inspector.
