@@ -6,10 +6,10 @@ using UnityEngine.UI;
 namespace TutorialInfo.Scripts {
     public class TutorialInfo : MonoBehaviour {
         // string to store Prefs Key with name of preference for showing the overlay info
-        public static string showAtStartPrefsKey = "showLaunchScreen";
+        public static string ShowAtStartPrefsKey = "showLaunchScreen";
 
         // used to ensure that the launch screen isn't more than once per play session if the project reloads the main scene
-        private static bool alreadyShownThisSession;
+        private static bool _alreadyShownThisSession;
 
         // store a reference to the audio listener in the scene, allowing for muting of the scene during the overlay
         public AudioListener mainListener;
@@ -26,17 +26,16 @@ namespace TutorialInfo.Scripts {
         // location that Visit Tutorial button sends the user
         public string url;
 
-
         private void Awake() {
             // have we already shown this once?
-            if (alreadyShownThisSession) {
+            if (_alreadyShownThisSession) {
                 StartGame();
             }
             else {
-                alreadyShownThisSession = true;
+                _alreadyShownThisSession = true;
 
                 // Check player prefs for show at start preference
-                if (PlayerPrefs.HasKey(showAtStartPrefsKey)) showAtStart = PlayerPrefs.GetInt(showAtStartPrefsKey) == 1;
+                if (PlayerPrefs.HasKey(ShowAtStartPrefsKey)) showAtStart = PlayerPrefs.GetInt(ShowAtStartPrefsKey) == 1;
 
                 // set UI toggle to match the existing UI preference
                 showAtStartToggle.isOn = showAtStart;
@@ -73,7 +72,7 @@ namespace TutorialInfo.Scripts {
         // set the boolean storing show at start status to equal the UI toggle's status
         public void ToggleShowAtLaunch() {
             showAtStart = showAtStartToggle.isOn;
-            PlayerPrefs.SetInt(showAtStartPrefsKey, showAtStart ? 1 : 0);
+            PlayerPrefs.SetInt(ShowAtStartPrefsKey, showAtStart ? 1 : 0);
         }
     }
 }
