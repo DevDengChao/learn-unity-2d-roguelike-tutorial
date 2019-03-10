@@ -22,6 +22,8 @@ namespace Scripts {
 
         private Animator _animator; //Used to store a reference to the Player's animator component.
         private int _food; //Used to store player food points total during level.
+        private static readonly int PlayerChop = Animator.StringToHash("playerChop");
+        private static readonly int PlayerHit = Animator.StringToHash("playerHit");
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
@@ -54,12 +56,38 @@ namespace Scripts {
             //If it's not the player's turn, exit the function.
             if (!GameManager.Instance.playersTurn) return;
 
-            var horizontal = 0; //Used to store the horizontal move direction.
-            var vertical = 0; //Used to store the vertical move direction.
+            HandleInput(out var horizontal, out var vertical);
 
+            //Check if we have a non-zero value for horizontal or vertical
+            if (horizontal != 0 || vertical != 0) AttemptMove<Wall>(horizontal, vertical);
+        }
+
+        //AttemptMove overrides the AttemptMove function in the base class MovingObject
+        //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
+        protected override void AttemptMove<T>(int xDir, int yDir) {
+            //Every time player moves, subtract from food points total.
+            _food--;
+
+            //Update food text display to reflect current score.
+            foodText.text = "Food: " + _food;
+
+            //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
+            base.AttemptMove<T>(xDir, yDir);
+
+            //Hit allows us to reference the result of the Linecast done in Move.
+            //If Move returns true, meaning Player was able to move into an empty space.
+            if (Move(xDir, yDir, out _ /*hit*/)) SoundManager.Instance.RandomizeSfx(moveSound1, moveSound2);
+
+            //Since the player has moved and lost food points, check if the game has ended.
+            CheckIfGameOver();
+
+            //Set the playersTurn boolean of GameManager to false now that players turn is over.
+            GameManager.Instance.playersTurn = false;
+        }
+
+        private static void HandleInput(out int horizontal, out int vertical) {
             //Check if we are running either in the Unity editor or in a standalone build.
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
-
             //Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
             horizontal = (int) Input.GetAxisRaw("Horizontal");
 
@@ -107,35 +135,7 @@ namespace Scripts {
 						vertical = y > 0 ? 1 : -1;
 				}
 			}
-			
-#endif //End of mobile platform dependendent compilation section started above with #elif
-            //Check if we have a non-zero value for horizontal or vertical
-            if (horizontal != 0 || vertical != 0) AttemptMove<Wall>(horizontal, vertical);
-        }
-
-        //AttemptMove overrides the AttemptMove function in the base class MovingObject
-        //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-        protected override void AttemptMove<T>(int xDir, int yDir) {
-            //Every time player moves, subtract from food points total.
-            _food--;
-
-            //Update food text display to reflect current score.
-            foodText.text = "Food: " + _food;
-
-            //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-            base.AttemptMove<T>(xDir, yDir);
-
-            //Hit allows us to reference the result of the Linecast done in Move.
-            RaycastHit2D hit;
-
-            //If Move returns true, meaning Player was able to move into an empty space.
-            if (Move(xDir, yDir, out hit)) SoundManager.Instance.RandomizeSfx(moveSound1, moveSound2);
-
-            //Since the player has moved and lost food points, check if the game has ended.
-            CheckIfGameOver();
-
-            //Set the playersTurn boolean of GameManager to false now that players turn is over.
-            GameManager.Instance.playersTurn = false;
+#endif //End of mobile platform dependent compilation section started above with #elif
         }
 
 
@@ -146,58 +146,61 @@ namespace Scripts {
             var hitWall = component as Wall;
 
             //Call the DamageWall function of the Wall we are hitting.
-            hitWall.DamageWall(wallDamage);
+            if (hitWall != null) hitWall.DamageWall(wallDamage);
 
             //Set the attack trigger of the player's animation controller in order to play the player's attack animation.
-            _animator.SetTrigger("playerChop");
+            _animator.SetTrigger(PlayerChop);
         }
 
 
         //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
         private void OnTriggerEnter2D(Collider2D other) {
-            //Check if the tag of the trigger collided with is Exit.
-            if (other.tag == "Exit") {
-                //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-                Invoke("Restart", restartLevelDelay);
+            switch (other.tag) {
+                //Check if the tag of the trigger collided with is Exit.
+                //Check if the tag of the trigger collided with is Food.
+                case "Exit":
+                    //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+                    Invoke(nameof(Restart), restartLevelDelay);
 
-                //Disable the player object since level is over.
-                enabled = false;
-            }
+                    //Disable the player object since level is over.
+                    enabled = false;
+                    break;
+                //Check if the tag of the trigger collided with is Soda.
+                case "Food":
+                    //Add pointsPerFood to the players current food total.
+                    _food += pointsPerFood;
 
-            //Check if the tag of the trigger collided with is Food.
-            else if (other.tag == "Food") {
-                //Add pointsPerFood to the players current food total.
-                _food += pointsPerFood;
+                    //Update foodText to represent current total and notify player that they gained points
+                    foodText.text = "+" + pointsPerFood + " Food: " + _food;
 
-                //Update foodText to represent current total and notify player that they gained points
-                foodText.text = "+" + pointsPerFood + " Food: " + _food;
+                    //Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
+                    SoundManager.Instance.RandomizeSfx(eatSound1, eatSound2);
 
-                //Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
-                SoundManager.Instance.RandomizeSfx(eatSound1, eatSound2);
+                    //Disable the food object the player collided with.
+                    other.gameObject.SetActive(false);
+                    break;
+                case "Soda":
+                    //Add pointsPerSoda to players food points total
+                    _food += pointsPerSoda;
 
-                //Disable the food object the player collided with.
-                other.gameObject.SetActive(false);
-            }
+                    //Update foodText to represent current total and notify player that they gained points
+                    foodText.text = "+" + pointsPerSoda + " Food: " + _food;
 
-            //Check if the tag of the trigger collided with is Soda.
-            else if (other.tag == "Soda") {
-                //Add pointsPerSoda to players food points total
-                _food += pointsPerSoda;
+                    //Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
+                    SoundManager.Instance.RandomizeSfx(drinkSound1, drinkSound2);
 
-                //Update foodText to represent current total and notify player that they gained points
-                foodText.text = "+" + pointsPerSoda + " Food: " + _food;
-
-                //Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
-                SoundManager.Instance.RandomizeSfx(drinkSound1, drinkSound2);
-
-                //Disable the soda object the player collided with.
-                other.gameObject.SetActive(false);
+                    //Disable the soda object the player collided with.
+                    other.gameObject.SetActive(false);
+                    break;
+                default:
+                    print(other);
+                    break;
             }
         }
 
 
         //Restart reloads the scene when called.
-        private void Restart() {
+        private static void Restart() {
             //Load the last scene loaded, in this case Main, the only scene in the game. And we load it in "Single" mode so it replace the existing one
             //and not load all the scene object in the current scene.
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
@@ -208,7 +211,7 @@ namespace Scripts {
         //It takes a parameter loss which specifies how many points to lose.
         public void LoseFood(int loss) {
             //Set the trigger for the player animator to transition to the playerHit animation.
-            _animator.SetTrigger("playerHit");
+            _animator.SetTrigger(PlayerHit);
 
             //Subtract lost food points from the players total.
             _food -= loss;
@@ -224,16 +227,15 @@ namespace Scripts {
         //CheckIfGameOver checks if the player is out of food points and if so, ends the game.
         private void CheckIfGameOver() {
             //Check if food point total is less than or equal to zero.
-            if (_food <= 0) {
-                //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
-                SoundManager.Instance.PlaySingle(gameOverSound);
+            if (_food > 0) return;
+            //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
+            SoundManager.Instance.PlaySingle(gameOverSound);
 
-                //Stop the background music.
-                SoundManager.Instance.musicSource.Stop();
+            //Stop the background music.
+            SoundManager.Instance.musicSource.Stop();
 
-                //Call the GameOver function of GameManager.
-                GameManager.Instance.GameOver();
-            }
+            //Call the GameOver function of GameManager.
+            GameManager.Instance.GameOver();
         }
     }
 }
