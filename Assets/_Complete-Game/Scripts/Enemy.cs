@@ -5,12 +5,26 @@ namespace Scripts {
     public class Enemy : MovingObject {
         private static readonly int EnemyAttack = Animator.StringToHash("enemyAttack");
         private Animator _animator; //Variable of type Animator to store a reference to the enemy's Animator component.
+
+        private int _hp = 1;
         private bool _skipMove; //Boolean to determine whether or not enemy should skip a turn or move this turn.
         private Transform _target; //Transform to attempt to move toward each turn.
         public AudioClip attackSound1; //First of two audio clips to play when attacking the player.
         public AudioClip attackSound2; //Second of two audio clips to play when attacking the player.
         public int playerDamage; //The amount of food points to subtract from the player when attacking.
 
+        //DamageWall is called when the player attacks a wall.
+        public void DamageEnemy(int loss) {
+            //Subtract loss from hit point total.
+            _hp -= loss;
+            print($"{name} at {transform.position} hp = {_hp}");
+
+            //If hit points are less than or equal to zero:
+            if (_hp > 0) return;
+            print($"{name} at {transform.position} de-active");
+            //Disable the gameObject.
+            gameObject.SetActive(false);
+        }
 
         //Start overrides the virtual Start function of the base class.
         protected override void Start() {
