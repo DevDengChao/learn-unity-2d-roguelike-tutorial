@@ -1,27 +1,29 @@
-using UnityEngine;
 using UnityEditor;
-using System.Collections;
+using UnityEngine;
 
-[CustomEditor(typeof(TutorialInfo))]
-public class TutorialInfoEditor : Editor 
+namespace TutorialInfo.Scripts.Editor
 {
-	void OnEnable()
+	[CustomEditor(typeof(TutorialInfo))]
+	public class TutorialInfoEditor : UnityEditor.Editor 
 	{
-		if (PlayerPrefs.HasKey(TutorialInfo.showAtStartPrefsKey))
+		void OnEnable()
 		{
-			((TutorialInfo)target).showAtStart = PlayerPrefs.GetInt(TutorialInfo.showAtStartPrefsKey) == 1;
+			if (PlayerPrefs.HasKey(TutorialInfo.showAtStartPrefsKey))
+			{
+				((TutorialInfo)target).showAtStart = PlayerPrefs.GetInt(TutorialInfo.showAtStartPrefsKey) == 1;
+			}
 		}
-	}
 
-	public override void OnInspectorGUI()
-	{
-		EditorGUI.BeginChangeCheck ();
-
-		base.OnInspectorGUI ();
-
-		if (EditorGUI.EndChangeCheck ()) 
+		public override void OnInspectorGUI()
 		{
-			PlayerPrefs.SetInt(TutorialInfo.showAtStartPrefsKey, ((TutorialInfo)target).showAtStart ? 1 : 0);
+			EditorGUI.BeginChangeCheck ();
+
+			base.OnInspectorGUI ();
+
+			if (EditorGUI.EndChangeCheck ()) 
+			{
+				PlayerPrefs.SetInt(TutorialInfo.showAtStartPrefsKey, ((TutorialInfo)target).showAtStart ? 1 : 0);
+			}
 		}
 	}
 }
