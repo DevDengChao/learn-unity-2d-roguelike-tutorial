@@ -3,6 +3,7 @@
 namespace Scripts {
     //Enemy inherits from MovingObject, our base class for objects that can move, Player also inherits from this.
     public class Enemy : MovingObject {
+        private static readonly int EnemyAttack = Animator.StringToHash("enemyAttack");
         private Animator _animator; //Variable of type Animator to store a reference to the enemy's Animator component.
         private bool _skipMove; //Boolean to determine whether or not enemy should skip a turn or move this turn.
         private Transform _target; //Transform to attempt to move toward each turn.
@@ -74,11 +75,11 @@ namespace Scripts {
             //Declare hitPlayer and set it to equal the encountered component.
             var hitPlayer = component as Player;
 
-            //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
-            hitPlayer.LoseFood(playerDamage);
+            //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of food points to be subtracted.
+            if (hitPlayer != null) hitPlayer.LoseFood(playerDamage);
 
             //Set the attack trigger of animator to trigger Enemy attack animation.
-            _animator.SetTrigger("enemyAttack");
+            _animator.SetTrigger(EnemyAttack);
 
             //Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
             SoundManager.Instance.RandomizeSfx(attackSound1, attackSound2);
