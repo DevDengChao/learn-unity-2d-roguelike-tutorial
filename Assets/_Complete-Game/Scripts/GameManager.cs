@@ -57,11 +57,11 @@ namespace Scripts {
             InitGame();
         }
 
-        //this is called only once, and the paramter tell it to be called only after the scene was loaded
+        //this is called only once, and the parameter tell it to be called only after the scene was loaded
         //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         public static void CallbackInitialization() {
-            //register the callback to be called everytime the scene is loaded
+            //register the callback to be called every time the scene is loaded
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
@@ -90,7 +90,7 @@ namespace Scripts {
             _levelImage.SetActive(true);
 
             //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
-            Invoke("HideLevelImage", levelStartDelay);
+            Invoke(nameof(HideLevelImage), levelStartDelay);
 
             //Clear any Enemy objects in our List to prepare for next level.
             _enemies.Clear();
@@ -152,12 +152,12 @@ namespace Scripts {
             if (_enemies.Count == 0) yield return new WaitForSeconds(turnDelay);
 
             //Loop through List of Enemy objects.
-            for (var i = 0; i < _enemies.Count; i++) {
+            foreach (var enemy in _enemies) {
                 //Call the MoveEnemy function of Enemy at index i in the enemies List.
-                _enemies[i].MoveEnemy();
+                enemy.MoveEnemy();
 
                 //Wait for Enemy's moveTime before moving next Enemy, 
-                yield return new WaitForSeconds(_enemies[i].moveTime);
+                yield return new WaitForSeconds(enemy.moveTime);
             }
 
             //Once Enemies are done moving, set playersTurn to true so player can move.
