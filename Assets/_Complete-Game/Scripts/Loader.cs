@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
 
-namespace Scripts
-{
-    public class Loader : MonoBehaviour
-    {
+namespace Scripts {
+    public class Loader : MonoBehaviour {
         public GameObject gameManager; //GameManager prefab to instantiate.
         public GameObject soundManager; //SoundManager prefab to instantiate.
 
 
-        void Awake()
-        {
+        private void Awake() {
             //Check if a GameManager has already been assigned to static variable GameManager.instance or if it's still null
             if (GameManager.instance == null)
 

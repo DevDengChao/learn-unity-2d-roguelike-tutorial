@@ -4,11 +4,9 @@ using UnityEngine.UI;
 
 //Allows us to use UI.
 
-namespace Scripts
-{
+namespace Scripts {
     //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
-    public class Player : MovingObject
-    {
+    public class Player : MovingObject {
         public float restartLevelDelay = 1f; //Delay time in seconds to restart level.
         public int pointsPerFood = 10; //Number of points to add to player food points when picking up a food object.
         public int pointsPerSoda = 20; //Number of points to add to player food points when picking up a soda object.
@@ -30,8 +28,7 @@ namespace Scripts
 
 
         //Start overrides the Start function of MovingObject
-        protected override void Start()
-        {
+        protected override void Start() {
             //Get a component reference to the Player's animator component
             animator = GetComponent<Animator>();
 
@@ -47,15 +44,13 @@ namespace Scripts
 
 
         //This function is called when the behaviour becomes disabled or inactive.
-        private void OnDisable()
-        {
+        private void OnDisable() {
             //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
             GameManager.instance.playerFoodPoints = food;
         }
 
 
-        private void Update()
-        {
+        private void Update() {
             //If it's not the player's turn, exit the function.
             if (!GameManager.instance.playersTurn) return;
 
@@ -72,8 +67,7 @@ namespace Scripts
             vertical = (int) (Input.GetAxisRaw("Vertical"));
 
             //Check if moving horizontally, if so set vertical to zero.
-            if (horizontal != 0)
-            {
+            if (horizontal != 0) {
                 vertical = 0;
             }
             //Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
@@ -118,8 +112,7 @@ namespace Scripts
 			
 #endif //End of mobile platform dependendent compilation section started above with #elif
             //Check if we have a non-zero value for horizontal or vertical
-            if (horizontal != 0 || vertical != 0)
-            {
+            if (horizontal != 0 || vertical != 0) {
                 //Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
                 //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
                 AttemptMove<Wall>(horizontal, vertical);
@@ -128,8 +121,7 @@ namespace Scripts
 
         //AttemptMove overrides the AttemptMove function in the base class MovingObject
         //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-        protected override void AttemptMove<T>(int xDir, int yDir)
-        {
+        protected override void AttemptMove<T>(int xDir, int yDir) {
             //Every time player moves, subtract from food points total.
             food--;
 
@@ -143,8 +135,7 @@ namespace Scripts
             RaycastHit2D hit;
 
             //If Move returns true, meaning Player was able to move into an empty space.
-            if (Move(xDir, yDir, out hit))
-            {
+            if (Move(xDir, yDir, out hit)) {
                 //Call RandomizeSfx of SoundManager to play the move sound, passing in two audio clips to choose from.
                 SoundManager.instance.RandomizeSfx(moveSound1, moveSound2);
             }
@@ -159,8 +150,7 @@ namespace Scripts
 
         //OnCantMove overrides the abstract function OnCantMove in MovingObject.
         //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-        protected override void OnCantMove<T>(T component)
-        {
+        protected override void OnCantMove<T>(T component) {
             //Set hitWall to equal the component passed in as a parameter.
             Wall hitWall = component as Wall;
 
@@ -173,11 +163,9 @@ namespace Scripts
 
 
         //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
-        private void OnTriggerEnter2D(Collider2D other)
-        {
+        private void OnTriggerEnter2D(Collider2D other) {
             //Check if the tag of the trigger collided with is Exit.
-            if (other.tag == "Exit")
-            {
+            if (other.tag == "Exit") {
                 //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
                 Invoke("Restart", restartLevelDelay);
 
@@ -186,8 +174,7 @@ namespace Scripts
             }
 
             //Check if the tag of the trigger collided with is Food.
-            else if (other.tag == "Food")
-            {
+            else if (other.tag == "Food") {
                 //Add pointsPerFood to the players current food total.
                 food += pointsPerFood;
 
@@ -202,8 +189,7 @@ namespace Scripts
             }
 
             //Check if the tag of the trigger collided with is Soda.
-            else if (other.tag == "Soda")
-            {
+            else if (other.tag == "Soda") {
                 //Add pointsPerSoda to players food points total
                 food += pointsPerSoda;
 
@@ -220,8 +206,7 @@ namespace Scripts
 
 
         //Restart reloads the scene when called.
-        private void Restart()
-        {
+        private void Restart() {
             //Load the last scene loaded, in this case Main, the only scene in the game. And we load it in "Single" mode so it replace the existing one
             //and not load all the scene object in the current scene.
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
@@ -230,8 +215,7 @@ namespace Scripts
 
         //LoseFood is called when an enemy attacks the player.
         //It takes a parameter loss which specifies how many points to lose.
-        public void LoseFood(int loss)
-        {
+        public void LoseFood(int loss) {
             //Set the trigger for the player animator to transition to the playerHit animation.
             animator.SetTrigger("playerHit");
 
@@ -247,11 +231,9 @@ namespace Scripts
 
 
         //CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-        private void CheckIfGameOver()
-        {
+        private void CheckIfGameOver() {
             //Check if food point total is less than or equal to zero.
-            if (food <= 0)
-            {
+            if (food <= 0) {
                 //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
                 SoundManager.instance.PlaySingle(gameOverSound);
 

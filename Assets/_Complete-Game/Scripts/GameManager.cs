@@ -4,35 +4,34 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Scripts
-{
-    public class GameManager : MonoBehaviour
-    {
-        public float levelStartDelay = 2f; //Time to wait before starting level, in seconds.
-        public float turnDelay = 0.1f; //Delay between each Player turn.
-        public int playerFoodPoints = 100; //Starting value for Player food points.
-
+namespace Scripts {
+    public class GameManager : MonoBehaviour {
         public static GameManager
-            instance = null; //Static instance of GameManager which allows it to be accessed by any other script.
+            instance; //Static instance of GameManager which allows it to be accessed by any other script.
 
-        [HideInInspector]
-        public bool playersTurn = true; //Boolean to check if it's players turn, hidden in inspector but public.
-
-
-        private Text levelText; //Text to display current level number.
-        private GameObject levelImage; //Image to block out level as levels are being set up, background for levelText.
         private BoardManager boardScript; //Store a reference to our BoardManager which will set up the level.
-        private int level = 1; //Current level number, expressed in game as "Day 1".
-        private List<Enemy> enemies; //List of all Enemy units, used to issue them move commands.
-        private bool enemiesMoving; //Boolean to check if enemies are moving.
 
         private bool
             doingSetup = true; //Boolean to check if we're setting up board, prevent Player from moving during setup.
 
+        private List<Enemy> enemies; //List of all Enemy units, used to issue them move commands.
+        private bool enemiesMoving; //Boolean to check if enemies are moving.
+        private int level = 1; //Current level number, expressed in game as "Day 1".
+        private GameObject levelImage; //Image to block out level as levels are being set up, background for levelText.
+        public float levelStartDelay = 2f; //Time to wait before starting level, in seconds.
+
+
+        private Text levelText; //Text to display current level number.
+        public int playerFoodPoints = 100; //Starting value for Player food points.
+
+        [HideInInspector]
+        public bool playersTurn = true; //Boolean to check if it's players turn, hidden in inspector but public.
+
+        public float turnDelay = 0.1f; //Delay between each Player turn.
+
 
         //Awake is always called before any Start functions
-        void Awake()
-        {
+        private void Awake() {
             //Check if instance already exists
             if (instance == null)
 
@@ -61,23 +60,20 @@ namespace Scripts
         //this is called only once, and the paramter tell it to be called only after the scene was loaded
         //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static public void CallbackInitialization()
-        {
+        public static void CallbackInitialization() {
             //register the callback to be called everytime the scene is loaded
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         //This is called each time a scene is loaded.
-        static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
-        {
+        private static void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
             instance.level++;
             instance.InitGame();
         }
 
 
         //Initializes the game for each level.
-        void InitGame()
-        {
+        private void InitGame() {
             //While doingSetup is true the player can't move, prevent player from moving while title card is up.
             doingSetup = true;
 
@@ -105,8 +101,7 @@ namespace Scripts
 
 
         //Hides black image used between levels
-        void HideLevelImage()
-        {
+        private void HideLevelImage() {
             //Disable the levelImage gameObject.
             levelImage.SetActive(false);
 
@@ -115,8 +110,7 @@ namespace Scripts
         }
 
         //Update is called every frame.
-        void Update()
-        {
+        private void Update() {
             //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || enemiesMoving || doingSetup)
 
@@ -128,16 +122,14 @@ namespace Scripts
         }
 
         //Call this to add the passed in Enemy to the List of Enemy objects.
-        public void AddEnemyToList(Enemy script)
-        {
+        public void AddEnemyToList(Enemy script) {
             //Add Enemy to List enemies.
             enemies.Add(script);
         }
 
 
         //GameOver is called when the player reaches 0 food points
-        public void GameOver()
-        {
+        public void GameOver() {
             //Set levelText to display number of levels passed and game over message
             levelText.text = "After " + level + " days, you starved.";
 
@@ -149,8 +141,7 @@ namespace Scripts
         }
 
         //Coroutine to move enemies in sequence.
-        IEnumerator MoveEnemies()
-        {
+        private IEnumerator MoveEnemies() {
             //While enemiesMoving is true player is unable to move.
             enemiesMoving = true;
 
@@ -158,15 +149,10 @@ namespace Scripts
             yield return new WaitForSeconds(turnDelay);
 
             //If there are no enemies spawned (IE in first level):
-            if (enemies.Count == 0)
-            {
-                //Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
-                yield return new WaitForSeconds(turnDelay);
-            }
+            if (enemies.Count == 0) yield return new WaitForSeconds(turnDelay);
 
             //Loop through List of Enemy objects.
-            for (int i = 0; i < enemies.Count; i++)
-            {
+            for (var i = 0; i < enemies.Count; i++) {
                 //Call the MoveEnemy function of Enemy at index i in the enemies List.
                 enemies[i].MoveEnemy();
 
