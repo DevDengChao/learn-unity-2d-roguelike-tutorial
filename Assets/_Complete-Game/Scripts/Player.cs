@@ -182,10 +182,11 @@ namespace Scripts {
                 //Check if the tag of the trigger collided with is Soda.
                 case "Food":
                     //Add pointsPerFood to the players current food total.
-                    _food += pointsPerFood;
+                    var randomFoodPoint = Random.Range(-pointsPerFood, pointsPerFood);
+                    _food += randomFoodPoint;
 
                     //Update foodText to represent current total and notify player that they gained points
-                    foodText.text = "+" + pointsPerFood + " Food: " + _food;
+                    foodText.text = "Food: " + randomFoodPoint + " Food: " + _food;
 
                     //Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
                     SoundManager.Instance.RandomizeSfx(eatSound1, eatSound2);
@@ -195,10 +196,11 @@ namespace Scripts {
                     break;
                 case "Soda":
                     //Add pointsPerSoda to players food points total
-                    _food += pointsPerSoda;
+                    var randomSodaPoint = Random.Range(-pointsPerSoda, pointsPerSoda);
+                    _food += randomSodaPoint;
 
                     //Update foodText to represent current total and notify player that they gained points
-                    foodText.text = "+" + pointsPerSoda + " Food: " + _food;
+                    foodText.text = "Soda: " + randomSodaPoint + " Food: " + _food;
 
                     //Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
                     SoundManager.Instance.RandomizeSfx(drinkSound1, drinkSound2);
