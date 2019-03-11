@@ -152,8 +152,7 @@ namespace Scripts {
 
             //Loop through List of Enemy objects.
             foreach (var enemy in _enemies) {
-                //Call the MoveEnemy function of Enemy at index i in the enemies List.
-                enemy.MoveEnemy();
+                if (enemy.gameObject.activeSelf) enemy.MoveEnemy();
 
                 //Wait for Enemy's moveTime before moving next Enemy, 
                 yield return new WaitForSeconds(enemy.moveTime);
