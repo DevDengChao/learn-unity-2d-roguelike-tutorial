@@ -173,11 +173,13 @@ namespace Scripts {
                 //Check if the tag of the trigger collided with is Exit.
                 //Check if the tag of the trigger collided with is Food.
                 case "Exit":
-                    //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
-                    Invoke(nameof(Restart), restartLevelDelay);
+                    if (_food > 0) {
+                        //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+                        Invoke(nameof(Restart), restartLevelDelay);
+                        //Disable the player object since level is over.
+                        enabled = false;
+                    }
 
-                    //Disable the player object since level is over.
-                    enabled = false;
                     break;
                 //Check if the tag of the trigger collided with is Soda.
                 case "Food":
