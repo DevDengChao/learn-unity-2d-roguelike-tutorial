@@ -3,6 +3,7 @@
 namespace Scripts {
     //Enemy inherits from MovingObject, our base class for objects that can move, Player also inherits from this.
     public class Enemy : MovingObject {
+        private const int Damage = 2; //The amount of damage to subtract from the player or wall when attacking.
         private static readonly int EnemyAttack = Animator.StringToHash("enemyAttack");
         private Animator _animator; //Variable of type Animator to store a reference to the enemy's Animator component.
 
@@ -13,7 +14,6 @@ namespace Scripts {
         public AudioClip attackPlayer2; //Second of two audio clips to play when attacking the player.
         public AudioClip attackWall1; //First of two audio clips to play when attacking the player.
         public AudioClip attackWall2; //Second of two audio clips to play when attacking the player.
-        public int damage; //The amount of food points to subtract from the player when attacking.
 
         //DamageWall is called when the player attacks a wall.
         public void DamageEnemy(int loss) {
@@ -26,6 +26,7 @@ namespace Scripts {
             print($"{name} at {transform.position} de-active");
             //Disable the gameObject.
             gameObject.SetActive(false); // clear object image from visual port
+            SoundManager.Instance.RandomizeSfx(attackWall1, attackWall2);
         }
 
         //Start overrides the virtual Start function of the base class.
@@ -92,18 +93,16 @@ namespace Scripts {
                 //Declare hitPlayer and set it to equal the encountered component.
                 //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of food points to be subtracted.
                 case Player player:
-                    player.LoseFood(damage);
+                    player.LoseFood(Damage);
 
                     //Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
                     SoundManager.Instance.RandomizeSfx(attackPlayer1, attackPlayer2);
                     break;
                 case Wall wall:
-                    wall.DamageWall(damage);
-                    SoundManager.Instance.RandomizeSfx(attackWall1, attackWall2);
+                    wall.DamageWall(Damage);
                     break;
                 case Enemy enemy:
-                    enemy.DamageEnemy(damage);
-                    SoundManager.Instance.RandomizeSfx(attackWall1, attackWall2);
+                    enemy.DamageEnemy(Damage);
                     break;
             }
 
