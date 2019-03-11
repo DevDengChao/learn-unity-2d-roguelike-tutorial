@@ -64,7 +64,7 @@ namespace Scripts {
             HandleInput(out var horizontal, out var vertical);
 
             //Check if we have a non-zero value for horizontal or vertical
-            if (horizontal != 0 || vertical != 0) AttemptMove<Wall>(horizontal, vertical);
+            if (horizontal != 0 || vertical != 0) AttemptMove<Enemy>(horizontal, vertical);
         }
 
         //AttemptMove overrides the AttemptMove function in the base class MovingObject
