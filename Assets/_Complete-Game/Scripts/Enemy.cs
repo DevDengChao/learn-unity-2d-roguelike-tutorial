@@ -9,9 +9,11 @@ namespace Scripts {
         private int _hp = 1;
         private bool _skipMove; //Boolean to determine whether or not enemy should skip a turn or move this turn.
         private Transform _target; //Transform to attempt to move toward each turn.
-        public AudioClip attackSound1; //First of two audio clips to play when attacking the player.
-        public AudioClip attackSound2; //Second of two audio clips to play when attacking the player.
-        public int playerDamage; //The amount of food points to subtract from the player when attacking.
+        public AudioClip attackPlayer1; //First of two audio clips to play when attacking the player.
+        public AudioClip attackPlayer2; //Second of two audio clips to play when attacking the player.
+        public AudioClip attackWall1; //First of two audio clips to play when attacking the player.
+        public AudioClip attackWall2; //Second of two audio clips to play when attacking the player.
+        public int damage; //The amount of food points to subtract from the player when attacking.
 
         //DamageWall is called when the player attacks a wall.
         public void DamageEnemy(int loss) {
@@ -86,17 +88,27 @@ namespace Scripts {
         //OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
         //and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
         protected override void OnCantMove(Component component) {
-            //Declare hitPlayer and set it to equal the encountered component.
-            var hitPlayer = component as Player;
+            switch (component) {
+                //Declare hitPlayer and set it to equal the encountered component.
+                //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of food points to be subtracted.
+                case Player player:
+                    player.LoseFood(damage);
 
-            //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of food points to be subtracted.
-            if (hitPlayer != null) hitPlayer.LoseFood(playerDamage);
+                    //Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
+                    SoundManager.Instance.RandomizeSfx(attackPlayer1, attackPlayer2);
+                    break;
+                case Wall wall:
+                    wall.DamageWall(damage);
+                    SoundManager.Instance.RandomizeSfx(attackWall1, attackWall2);
+                    break;
+                case Enemy enemy:
+                    enemy.DamageEnemy(damage);
+                    SoundManager.Instance.RandomizeSfx(attackWall1, attackWall2);
+                    break;
+            }
 
             //Set the attack trigger of animator to trigger Enemy attack animation.
             _animator.SetTrigger(EnemyAttack);
-
-            //Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
-            SoundManager.Instance.RandomizeSfx(attackSound1, attackSound2);
         }
     }
 }
