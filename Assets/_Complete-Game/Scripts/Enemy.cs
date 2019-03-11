@@ -45,7 +45,7 @@ namespace Scripts {
 
         //Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
         //See comments in MovingObject for more on how base AttemptMove function works.
-        protected override void AttemptMove<T>(int xDir, int yDir) {
+        private new void AttemptMove(int xDir, int yDir) {
             //Check if skipMove is true, if so set it to false and skip this turn.
             if (_skipMove) {
                 _skipMove = false;
@@ -53,7 +53,7 @@ namespace Scripts {
             }
 
             //Call the AttemptMove function from MovingObject.
-            base.AttemptMove<T>(xDir, yDir);
+            base.AttemptMove(xDir, yDir);
 
             //Now that Enemy has moved, set skipMove to true to skip next move.
             _skipMove = true;
@@ -79,13 +79,13 @@ namespace Scripts {
                 xDir = _target.position.x > transform.position.x ? 1 : -1;
 
             //Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
-            AttemptMove<Player>(xDir, yDir);
+            AttemptMove(xDir, yDir);
         }
 
 
         //OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
         //and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
-        protected override void OnCantMove<T>(T component) {
+        protected override void OnCantMove(Component component) {
             //Declare hitPlayer and set it to equal the encountered component.
             var hitPlayer = component as Player;
 

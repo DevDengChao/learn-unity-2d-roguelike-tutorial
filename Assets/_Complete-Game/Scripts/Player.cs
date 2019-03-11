@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -64,12 +63,12 @@ namespace Scripts {
             HandleInput(out var horizontal, out var vertical);
 
             //Check if we have a non-zero value for horizontal or vertical
-            if (horizontal != 0 || vertical != 0) AttemptMove<Enemy>(horizontal, vertical);
+            if (horizontal != 0 || vertical != 0) AttemptMove(horizontal, vertical);
         }
 
         //AttemptMove overrides the AttemptMove function in the base class MovingObject
         //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-        protected override void AttemptMove<T>(int xDir, int yDir) {
+        private new void AttemptMove(int xDir, int yDir) {
             //Every time player moves, subtract from food points total.
             _food--;
 
@@ -77,7 +76,7 @@ namespace Scripts {
             foodText.text = "Food: " + _food;
 
             //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-            base.AttemptMove<T>(xDir, yDir);
+            base.AttemptMove(xDir, yDir);
 
             //Hit allows us to reference the result of the Linecast done in Move.
             //If Move returns true, meaning Player was able to move into an empty space.
@@ -146,18 +145,20 @@ namespace Scripts {
 
         //OnCantMove overrides the abstract function OnCantMove in MovingObject.
         //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-        protected override void OnCantMove<T>([NotNull] T component) {
+        protected override void OnCantMove(Component component) {
             switch (component) {
-                case Wall hitWall:
+                case Wall wall:
                     print("Clear my path.");
                     //Set hitWall to equal the component passed in as a parameter.
                     //Call the DamageWall function of the Wall we are hitting.
-                    hitWall.DamageWall(damage);
+                    wall.DamageWall(damage);
                     break;
                 case Enemy enemy:
                     print("Kill!");
-                    // TODO Chao Deng: Kill enemy
                     enemy.DamageEnemy(damage);
+                    break;
+                default:
+                    print($"hit {component}, it's a kind of {component.GetType()}");
                     break;
             }
 
