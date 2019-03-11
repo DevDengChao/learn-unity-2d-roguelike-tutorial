@@ -94,10 +94,11 @@ namespace Scripts {
             var hitComponent = hit.transform.GetComponent<T>();
 
             //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
-            if (!canMove && hitComponent != null)
+            if (canMove || hitComponent == null) return;
 
-                //Call the OnCantMove function and pass it hitComponent as a parameter.
-                OnCantMove(hitComponent);
+            print($"{name} hit {hitComponent.name}");
+            //Call the OnCantMove function and pass it hitComponent as a parameter.
+            OnCantMove(hitComponent);
         }
 
 
