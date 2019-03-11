@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 namespace Scripts {
     public class GameManager : MonoBehaviour {
+        private const float TurnDelay = 0.1f; //Delay between each Player turn.
+
         public static GameManager
             Instance; //Static instance of GameManager which allows it to be accessed by any other script.
 
@@ -26,9 +28,6 @@ namespace Scripts {
 
         [HideInInspector]
         public bool playersTurn = true; //Boolean to check if it's players turn, hidden in inspector but public.
-
-        public float turnDelay = 0.1f; //Delay between each Player turn.
-
 
         //Awake is always called before any Start functions
         private void Awake() {
@@ -59,14 +58,14 @@ namespace Scripts {
 
         //this is called only once, and the parameter tell it to be called only after the scene was loaded
         //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod]
         public static void CallbackInitialization() {
             //register the callback to be called every time the scene is loaded
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         //This is called each time a scene is loaded.
-        private static void OnSceneLoaded(Scene arg0, LoadSceneMode arg1) {
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
             Instance._level++;
             Instance.InitGame();
         }
@@ -146,10 +145,10 @@ namespace Scripts {
             _enemiesMoving = true;
 
             //Wait for turnDelay seconds, defaults to .1 (100 ms).
-            yield return new WaitForSeconds(turnDelay);
+            yield return new WaitForSeconds(TurnDelay);
 
             //If there are no enemies spawned (IE in first level):
-            if (_enemies.Count == 0) yield return new WaitForSeconds(turnDelay);
+            if (_enemies.Count == 0) yield return new WaitForSeconds(TurnDelay);
 
             //Loop through List of Enemy objects.
             foreach (var enemy in _enemies) {
