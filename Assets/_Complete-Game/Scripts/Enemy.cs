@@ -23,7 +23,7 @@ namespace Scripts {
             if (_hp > 0) return;
             print($"{name} at {transform.position} de-active");
             //Disable the gameObject.
-            gameObject.SetActive(false);
+            gameObject.SetActive(false); // clear object image from visual port
         }
 
         //Start overrides the virtual Start function of the base class.
