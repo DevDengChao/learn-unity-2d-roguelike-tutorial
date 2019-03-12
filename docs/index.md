@@ -51,3 +51,8 @@
  ┣ *.csproj (Visual studio 编译项目时生产的文件, 应该被 VCS 忽略)
  ┗ *.sln (Visual studio 的项目管理文件, 应该被 VCS 管理)
 ```
+
+## _Complete-Game
+
+该目录下包含整个教程完整的示例, 是我学习这个项目的主战场.
+
