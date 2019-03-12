@@ -391,7 +391,7 @@ ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
-*.sln
+!*.sln
 *.booproj
 *.svd
 
