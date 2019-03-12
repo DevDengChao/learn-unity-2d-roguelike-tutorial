@@ -24,6 +24,9 @@ namespace Scripts
 
             //Set SoundManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
             DontDestroyOnLoad(gameObject);
+
+            efxSource = GetComponent<AudioSource>();
+            musicSource = GetComponent<AudioSource>();
         }
 
 
