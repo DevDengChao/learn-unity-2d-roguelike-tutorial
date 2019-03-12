@@ -6,6 +6,8 @@
 官方教程中提供的视频来自 YouTube, 国内有搬运工已经把整套视频搬到 
 [Bilibili](https://www.bilibili.com/video/av5480978) 了.
 
+[TOC]
+
 ## Rules
 
 通过试玩, 我发现了这个小游戏的一些基础的游戏规则:
