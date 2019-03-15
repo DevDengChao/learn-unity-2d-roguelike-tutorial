@@ -69,3 +69,12 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 
 该目录下包含整个教程完整的示例, 是我学习这个项目的主战场.
 
+### Readme.asset
+
+该文件中记录了 [TutorialInfo/Scripts/Readme.cs](../Assets/TutorialInfo/Scripts/Readme.cs)
+类对应的元数据. 进一步探索发现这个资产的 `Inspector` 界面以及顶部工具栏里的 `Tutorial` 菜单都是通过
+[TutorialInfo/Scripts/Editor/ReadmeEditor.cs](../Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
+控制的.
+
+到处改一改, 发现 Unity 插件开发相当的敏捷, 不像 IDEA 的插件, 
+每次测试插件效果都要重启一个 IDEA 实例. 这个应该也跟编程语言有关系吧.
