@@ -217,3 +217,61 @@ protected override void OnCantMove <T> (T component)
 }
 ```
 
+### MovingObject.cs
+
+可移动的对象. 作为敌人和玩家的父类, 为子类提供了移动方向的碰撞检测和平滑移动能力.
+
+在尝试移动时, 调用 `Move(...)` 方法进行碰撞检测, 遇到障碍时调用回调方法 `OnCannotMove<>()`, 
+否则开启协程进行平滑移动.
+
+```c#
+//Move returns true if it is able to move and false if not. 
+//Move takes parameters for x direction, y direction and a RaycastHit2D to check collision.
+protected bool Move(int xDir, int yDir, out RaycastHit2D hit)
+{
+	...
+	//Cast a line from start point to end point checking collision on blockingLayer.
+	hit = Physics2D.Linecast (start, end, blockingLayer);
+	...
+	if(hit.transform == null)
+	{
+		//If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
+		StartCoroutine(SmoothMovement(end));
+		//Return true to say that Move was successful
+		return true;
+	}
+	//If something was hit, return false, Move was unsuccesful.
+	return false;
+}
+```
+
+`Move(...)` 方法同时输出了 2 个结果, 一个 `bool` 类型的返回值, 标志着能否朝指定方向移动,
+以及一个 `RaycastHit2D` 类型的碰撞结果. 我个人感觉布尔类型的返回值有点多余, 
+通过判断碰撞结果是否为 null 即可.
+
+```c#
+//The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.
+//AttemptMove takes a generic parameter T to specify the type of component we expect our unit to interact with if blocked (Player for Enemies, Wall for Player).
+protected virtual void AttemptMove <T> (int xDir, int yDir)
+	where T : Component
+{
+	//Hit will store whatever our linecast hits when Move is called.
+	RaycastHit2D hit;
+	//Set canMove to true if Move was successful, false if failed.
+	bool canMove = Move (xDir, yDir, out hit);
+	//Check if nothing was hit by linecast
+	if(hit.transform == null)
+		//If nothing was hit, return and don't execute further code.
+		return;
+	
+	//Get a component reference to the component of type T attached to the object that was hit
+	T hitComponent = hit.transform.GetComponent <T> ();
+	//If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
+	if(!canMove && hitComponent != null)
+		//Call the OnCantMove function and pass it hitComponent as a parameter.
+		OnCantMove (hitComponent);
+}
+```
+
+`AttemptMove(int,int)` 判断到能移动时没有执行动作, 这里其实可以把 `Move()` 
+方法中开协程进行平滑移动的代码移动到这里来的.
