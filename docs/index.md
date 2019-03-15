@@ -52,6 +52,19 @@
  ┗ *.sln (Visual studio 的项目管理文件, 应该被 VCS 管理)
 ```
 
+## Version control
+
+第一次接触 Unity 工程, 在做版本控制的时候搜了一些文档, 主要提到了要将 `Edit->Project
+Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以及将
+`Asset serialization mode` 改为 `Force Text`. 
+
+仔细调试了一下后, 发现 `Visible Meta Files` 能够使 Unity 在导入工程的时候生成各种
+`.meta` 后缀的文件. 而 `Force Text` 则控制着 `*.meta` 文件里的内容格式,
+将各种元数据序列化为可读性较好的 `Unity YAML` 格式.
+
+后来测试发现这些 `*.meta` 文件记录着 `Inspector` 面板中的数据, 是 Unity
+的各种组件之间的依赖关系的持久化文件.
+
 ## _Complete-Game
 
 该目录下包含整个教程完整的示例, 是我学习这个项目的主战场.
