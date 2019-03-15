@@ -177,24 +177,30 @@ gameObject.SetActive(false);
 然后尝试移动, 没有考虑到撞墙, 绕路等情况.
 
 ```c#
-//MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
+//MoveEnemy is called by the GameManger each turn to tell each Enemy to 
+//try to move towards the player.
 public void MoveEnemy() {
-    //Declare variables for X and Y axis move directions, these range from -1 to 1.
-    //These values allow us to choose between the cardinal directions: up, down, left and right.
+    //Declare variables for X and Y axis move directions, these range 
+    //from -1 to 1. These values allow us to choose between the cardinal
+    //directions: up, down, left and right.
     var xDir = 0;
     var yDir = 0;
 
     //If the difference in positions is approximately zero (Epsilon) do the following:
     if (Mathf.Abs(_target.position.x - transform.position.x) < float.Epsilon)
-        //If the y coordinate of the target's (player) position is greater than the y coordinate of this enemy's position set y direction 1 (to move up). If not, set it to -1 (to move down).
+        //If the y coordinate of the target's (player) position is greater 
+        //than the y coordinate of this enemy's position set y direction 1
+        //(to move up). If not, set it to -1 (to move down).
         yDir = _target.position.y > transform.position.y ? 1 : -1;
 
     //If the difference in positions is not approximately zero (Epsilon) do the following:
     else
-        //Check if target x position is greater than enemy's x position, if so set x direction to 1 (move right), if not set to -1 (move left).
+        //Check if target x position is greater than enemy's x position,
+        //if so set x direction to 1 (move right), if not set to -1 (move left).
         xDir = _target.position.x > transform.position.x ? 1 : -1;
 
-    //Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
+    //Call the AttemptMove function and pass in the generic parameter Player,
+    //because Enemy is moving and expecting to potentially encounter a Player
     AttemptMove(xDir, yDir);
 }
 ```
@@ -202,17 +208,21 @@ public void MoveEnemy() {
 当遇到玩家导致不能移动时, 则攻击玩家, 触发攻击动画同时播放攻击音效.
 
 ```c#
-//OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
-//and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
+//OnCantMove is called if Enemy attempts to move into a space occupied 
+//by a Player, it overrides the OnCantMove function of MovingObject 
+//and takes a generic parameter T which we use to pass in the component 
+//we expect to encounter, in this case Player
 protected override void OnCantMove <T> (T component)
 {
 	//Declare hitPlayer and set it to equal the encountered component.
 	Player hitPlayer = component as Player;
-	//Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
+	//Call the LoseFood function of hitPlayer passing it playerDamage, 
+	//the amount of foodpoints to be subtracted.
 	hitPlayer.LoseFood (playerDamage);
 	//Set the attack trigger of animator to trigger Enemy attack animation.
 	animator.SetTrigger ("enemyAttack");
-	//Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
+	//Call the RandomizeSfx function of SoundManager passing in 
+	//the two audio clips to choose randomly between.
 	SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
 }
 ```
@@ -235,7 +245,8 @@ protected bool Move(int xDir, int yDir, out RaycastHit2D hit)
 	...
 	if(hit.transform == null)
 	{
-		//If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
+		//If nothing was hit, start SmoothMovement co-routine passing in 
+		//the Vector2 end as destination
 		StartCoroutine(SmoothMovement(end));
 		//Return true to say that Move was successful
 		return true;
@@ -250,8 +261,10 @@ protected bool Move(int xDir, int yDir, out RaycastHit2D hit)
 通过判断碰撞结果是否为 null 即可.
 
 ```c#
-//The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.
-//AttemptMove takes a generic parameter T to specify the type of component we expect our unit to interact with if blocked (Player for Enemies, Wall for Player).
+//The virtual keyword means AttemptMove can be overridden by inheriting classes 
+//using the override keyword. AttemptMove takes a generic parameter T 
+//to specify the type of component we expect our unit to interact with if blocked 
+//(Player for Enemies, Wall for Player).
 protected virtual void AttemptMove <T> (int xDir, int yDir)
 	where T : Component
 {
@@ -266,7 +279,8 @@ protected virtual void AttemptMove <T> (int xDir, int yDir)
 	
 	//Get a component reference to the component of type T attached to the object that was hit
 	T hitComponent = hit.transform.GetComponent <T> ();
-	//If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
+	//If canMove is false and hitComponent is not equal to null, meaning 
+	//MovingObject is blocked and has hit something it can interact with.
 	if(!canMove && hitComponent != null)
 		//Call the OnCantMove function and pass it hitComponent as a parameter.
 		OnCantMove (hitComponent);
@@ -275,3 +289,70 @@ protected virtual void AttemptMove <T> (int xDir, int yDir)
 
 `AttemptMove(int,int)` 判断到能移动时没有执行动作, 这里其实可以把 `Move()` 
 方法中开协程进行平滑移动的代码移动到这里来的.
+
+### Player.cs
+
+玩家.
+
+玩家类使用宏对运行平台进行了隔离, 移动端判断滑动方向, 桌面端则是判断 `WASD` 和 `↑↓←→`
+进行移动. 不能移动时可以攻击内墙. 
+```c#
+        private static void HandleInput(out int horizontal, out int vertical) {
+            //Check if we are running either in the Unity editor or in a standalone build.
+#if UNITY_STANDALONE || UNITY_WEBPLAYER
+            //Get input from the input manager, round it to an integer 
+            //and store in horizontal to set x axis move direction
+            horizontal = (int) Input.GetAxisRaw("Horizontal");
+            //Get input from the input manager, round it to an integer 
+            //and store in vertical to set y axis move direction
+            vertical = (int) Input.GetAxisRaw("Vertical");
+            //Check if moving horizontally, if so set vertical to zero.
+            if (horizontal != 0) vertical = 0;
+            //Check if we are running on iOS, Android, Windows Phone 8 or Unity iPhone
+#elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
+			...
+#endif //End of mobile platform dependent compilation section started above with #elif
+        }
+
+```
+
+
+玩家实现了 `OnTriggerEnter2D(Collider2D)` 方法, 从而监听到了 2d 碰撞箱的碰撞事件,
+对遇到食物和苏打分别进行了不同程度的生命恢复, 遇到出口时则触发场景的重载, 进入下一关卡.
+
+```c#
+//OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
+private void OnTriggerEnter2D (Collider2D other)
+{
+	//Check if the tag of the trigger collided with is Exit.
+	if(other.tag == "Exit")
+	{
+		//Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
+		Invoke ("Restart", restartLevelDelay);
+		//Disable the player object since level is over.
+		enabled = false;
+	}
+	//Check if the tag of the trigger collided with is Food.
+	else if(other.tag == "Food")
+	{
+		//Add pointsPerFood to the players current food total.
+		food += pointsPerFood;
+		//Update foodText to represent current total and notify player that they gained points
+		foodText.text = "+" + pointsPerFood + " Food: " + food;
+		//Call the RandomizeSfx function of SoundManager and pass in 
+		//two eating sounds to choose between to play the eating sound effect.
+		SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
+		//Disable the food object the player collided with.
+		other.gameObject.SetActive (false);
+	}
+	//Check if the tag of the trigger collided with is Soda.
+	else if(other.tag == "Soda")
+	{
+		...
+	}
+}
+```
+
+当玩家被敌人攻击时, 回调 `OnLossFood(int)` 方法, 触发被攻击动画, 移除生命值, 
+并判断游戏是否结束.
+
