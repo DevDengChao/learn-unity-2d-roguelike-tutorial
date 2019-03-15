@@ -87,3 +87,9 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 脚本内容很简单, 通过 `Inspector` 中设置的属性实例化 
 [GameManager](../Assets/_Complete-Game/Scripts/GameManager.cs) 和 
 [SoundManager](../Assets/_Complete-Game/Scripts/SoundManager.cs) 对象.
+
+### SoundManager.cs
+
+音效管理器. 由于对象在 Unity 环境中托管, 因此在生命周期函数 `Awake` 
+中通过判断静态引用的方式实现了单利设计. 利用 `AudioSource` 类播放本地音频文件, 
+为了避免听觉疲劳, 使用了随机数调整音效的高低音.
