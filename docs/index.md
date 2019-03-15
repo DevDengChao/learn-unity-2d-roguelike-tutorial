@@ -78,3 +78,12 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 
 到处改一改, 发现 Unity 插件开发相当的敏捷, 不像 IDEA 的插件, 
 每次测试插件效果都要重启一个 IDEA 实例. 这个应该也跟编程语言有关系吧.
+
+### Main.unity
+
+主场景, 仔细观察了一下发现在 Camera 上挂载着一个
+[Loader](../Assets/_Complete-Game/Scripts/Loader.cs) 脚本. 
+
+脚本内容很简单, 通过 `Inspector` 中设置的属性实例化 
+[GameManager](../Assets/_Complete-Game/Scripts/GameManager.cs) 和 
+[SoundManager](../Assets/_Complete-Game/Scripts/SoundManager.cs) 对象.
