@@ -80,11 +80,14 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 ### Main.unity
 
 主场景. 仔细观察了一下发现在 Camera 上挂载着一个
-[Loader](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Loader.cs) 脚本. 
+[Loader](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Loader.cs)
+脚本. 
 
 脚本内容很简单, 通过 `Inspector` 中设置的属性实例化 
-[GameManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/GameManager.cs) 和 
-[SoundManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/SoundManager.cs) 对象.
+[GameManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/GameManager.cs)
+和 
+[SoundManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/SoundManager.cs)
+对象.
 
 ### SoundManager.cs
 
@@ -113,7 +116,8 @@ private void Awake() {
 
 游戏管理器. 在 `Awake` 中定义了 [Enemy](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Enemy.cs) 
 集合, 并通过 `GetComponent<>()` 获取到了被托管的 
-[BoardManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/BoardManager.cs) 对象完成成员变量的初始化. 
+[BoardManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/BoardManager.cs)
+对象完成成员变量的初始化. 
 
 ```c#
 //Get a component reference to the attached BoardManager script
@@ -125,15 +129,16 @@ _boardScript = GetComponent<BoardManager>();
 
 在生命周期 `Update` 中, 如果不需要等待玩家移动, 其他敌人移动或者过场的话, 
 则尝试开启协程移动每一个 `Enemy` 对象. 全部 `Enemy` 移动完成后, 允许 
-[Player](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs) 移动.
+[Player](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs)
+移动.
 
 ### BoardManager.cs
 
 关卡管理器. 没有采用单例设计, 也没有实现生命周期方法. 
 
 对外仅暴露部分成员属性用于依赖注入, 以及 `SetupScene(int)` 方法用于实例化每一级关卡的外墙,
-地板, 内墙 ([Wall](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs)), 食物, 苏打,
-敌人以及出口.
+地板, 内墙 ([Wall](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs)),
+食物, 苏打, 敌人以及出口.
 
 具体的实例化方式则是调用 `Instantiate(...)` 方法, 将指定的预设物实例化在场景中.
 
@@ -159,4 +164,56 @@ _spriteRenderer.sprite = dmgSprite;
 if (_hp > 0) return;
 //If hit points are less than or equal to zero, disable the gameObject.
 gameObject.SetActive(false);
-```             
+```
+
+### Enemy.cs
+
+敌人. 继承自 MovingObject 类.
+
+在 `Start` 生命周期中将自身注册到 `GameManager`(我觉得这个注册的时机应该由 `BoardManager`
+管理), 并引用玩家的 `Transform` 对象, 以便在 `Update` 时向玩家移动.
+
+寻路的算法比较简陋, 简单的判断了一下自身与玩家的水平方向的差距和竖直方向的差距,
+然后尝试移动, 没有考虑到撞墙, 绕路等情况.
+
+```c#
+//MoveEnemy is called by the GameManger each turn to tell each Enemy to try to move towards the player.
+public void MoveEnemy() {
+    //Declare variables for X and Y axis move directions, these range from -1 to 1.
+    //These values allow us to choose between the cardinal directions: up, down, left and right.
+    var xDir = 0;
+    var yDir = 0;
+
+    //If the difference in positions is approximately zero (Epsilon) do the following:
+    if (Mathf.Abs(_target.position.x - transform.position.x) < float.Epsilon)
+        //If the y coordinate of the target's (player) position is greater than the y coordinate of this enemy's position set y direction 1 (to move up). If not, set it to -1 (to move down).
+        yDir = _target.position.y > transform.position.y ? 1 : -1;
+
+    //If the difference in positions is not approximately zero (Epsilon) do the following:
+    else
+        //Check if target x position is greater than enemy's x position, if so set x direction to 1 (move right), if not set to -1 (move left).
+        xDir = _target.position.x > transform.position.x ? 1 : -1;
+
+    //Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
+    AttemptMove(xDir, yDir);
+}
+```
+
+当遇到玩家导致不能移动时, 则攻击玩家, 触发攻击动画同时播放攻击音效.
+
+```c#
+//OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
+//and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
+protected override void OnCantMove <T> (T component)
+{
+	//Declare hitPlayer and set it to equal the encountered component.
+	Player hitPlayer = component as Player;
+	//Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
+	hitPlayer.LoseFood (playerDamage);
+	//Set the attack trigger of animator to trigger Enemy attack animation.
+	animator.SetTrigger ("enemyAttack");
+	//Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
+	SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+}
+```
+
