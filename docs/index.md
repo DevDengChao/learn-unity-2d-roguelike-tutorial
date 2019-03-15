@@ -356,3 +356,7 @@ private void OnTriggerEnter2D (Collider2D other)
 当玩家被敌人攻击时, 回调 `OnLossFood(int)` 方法, 触发被攻击动画, 移除生命值, 
 并判断游戏是否结束.
 
+## Learn by modifying
+
+至此, Unity 官方教程 2d-roguelike-tutorial 分析完毕, 接下来就是到处改东西, 
+看看会不会崩了 23333.
