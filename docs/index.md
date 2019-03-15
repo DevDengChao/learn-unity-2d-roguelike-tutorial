@@ -6,8 +6,6 @@
 官方教程中提供的视频来自 YouTube, 国内有搬运工已经把整套视频搬到 
 [Bilibili](https://www.bilibili.com/video/av5480978) 了.
 
-[TOC]
-
 ## Rules
 
 通过试玩, 我发现了这个小游戏的一些基础的游戏规则:
@@ -94,7 +92,7 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 中通过判断静态引用的方式实现了单利设计. 利用 `AudioSource` 类播放本地音频文件, 
 为了避免听觉疲劳, 使用了随机数调整音效的高低音.
 
-```
+```c#
 private void Awake() {
     //Check if there is already an instance of SoundManager
     if (Instance == null)
@@ -117,7 +115,7 @@ private void Awake() {
 集合, 并通过 `GetComponent<>()` 获取到了被托管的 
 [BoardManager](../Assets/_Complete-Game/Scripts/BoardManager.cs) 对象完成成员变量的初始化. 
 
-```
+```c#
 //Get a component reference to the attached BoardManager script
 _boardScript = GetComponent<BoardManager>();
 ```
@@ -139,9 +137,26 @@ _boardScript = GetComponent<BoardManager>();
 
 具体的实例化方式则是调用 `Instantiate(...)` 方法, 将指定的预设物实例化在场景中.
 
-```
+```c#
 //Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3
 //corresponding to current grid position in loop, cast it to GameObject. Set the parent of our newly
 //instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
 Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
 ```
+
+### Wall.cs
+
+内墙. 对外暴露 `DamageWall(int)` 方法, 从实现的功能上来看应该是属于回调类型的方法
+(更贴切一点的命名应该是 `OnDamage(int)` 吧 23333).
+
+内墙被攻击时通过调用 `SpriteRenderer` 实现了运行时将换贴图替换为受损状态的贴图, 
+hp 低于 0 时将 gameObject 设为失活从而将其从场景中隐藏.
+
+```c#
+//Set spriteRenderer to the damaged wall sprite.
+_spriteRenderer.sprite = dmgSprite;
+...
+if (_hp > 0) return;
+//If hit points are less than or equal to zero, disable the gameObject.
+gameObject.SetActive(false);
+```             
