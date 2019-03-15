@@ -94,10 +94,33 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 中通过判断静态引用的方式实现了单利设计. 利用 `AudioSource` 类播放本地音频文件, 
 为了避免听觉疲劳, 使用了随机数调整音效的高低音.
 
+```
+private void Awake() {
+    //Check if there is already an instance of SoundManager
+    if (Instance == null)
+        //if not, set it to this.
+        Instance = this;
+    //If instance already exists:
+    else if (Instance != this)
+        //Destroy this, this enforces our singleton pattern so there can only be one instance of SoundManager.
+        Destroy(gameObject);
+
+    //Set SoundManager to DontDestroyOnLoad so that it won't be destroyed when reloading our scene.
+    DontDestroyOnLoad(gameObject);
+    ...
+}
+```
+
 ### GameManger.cs
+
 游戏管理器. 在 `Awake` 中定义了 [Enemy](../Assets/_Complete-Game/Scripts/Enemy.cs) 
 集合, 并通过 `GetComponent<>()` 获取到了被托管的 
 [BoardManager](../Assets/_Complete-Game/Scripts/BoardManager.cs) 对象完成成员变量的初始化. 
+
+```
+//Get a component reference to the attached BoardManager script
+_boardScript = GetComponent<BoardManager>();
+```
 
 加下来调用 `InitGame` 方法控制 UI 层的遮罩以及关卡提示的显示与隐藏, 并调用了 
 `BoardManager` 的 `SetupScene(int)` 初始化了每一级关卡的动态场景. 
@@ -106,3 +129,19 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 则尝试开启协程移动每一个 `Enemy` 对象. 全部 `Enemy` 移动完成后, 允许 
 [Player](../Assets/_Complete-Game/Scripts/Player.cs) 移动.
 
+### BoardManager.cs
+
+关卡管理器. 没有采用单例设计, 也没有实现生命周期方法. 
+
+对外仅暴露部分成员属性用于依赖注入, 以及 `SetupScene(int)` 方法用于实例化每一级关卡的外墙,
+地板, 内墙 ([Wall](../Assets/_Complete-Game/Scripts/Player.cs)), 食物, 苏打,
+敌人以及出口.
+
+具体的实例化方式则是调用 `Instantiate(...)` 方法, 将指定的预设物实例化在场景中.
+
+```
+//Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3
+//corresponding to current grid position in loop, cast it to GameObject. Set the parent of our newly
+//instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
+Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
+```
