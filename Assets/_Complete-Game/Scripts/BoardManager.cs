@@ -9,6 +9,11 @@ namespace Scripts
     public class BoardManager : MonoBehaviour
     {
         /// <summary>
+        /// Static instance of BoardManager which allows it to be accessed by any other script.
+        /// </summary>
+        public static BoardManager Instance;
+
+        /// <summary>
         ///     Number of columns in our game board.
         /// </summary>
         private int _columns;
@@ -33,6 +38,11 @@ namespace Scripts
         /// </summary>
         private readonly Count _wallCount = new Count(5, 9);
 
+        /// <summary>
+        ///     How far could player see
+        /// </summary>
+        private const int VisibleRange = 2;
+
         private Transform _boardHolder; //A variable to store a reference to the transform of our Board object.
         public GameObject[] enemyTiles; //Array of enemy prefabs.
         public GameObject exit; //Prefab to spawn for exit.
@@ -44,9 +54,33 @@ namespace Scripts
 
         public GameObject[] wallTiles; //Array of wall prefabs.
 
+        public GameObject fog;
+        private GameObject _fogParent;
+
+        private List<GameObject> _fogs;
+
+        private void Awake()
+        {
+            //Check if instance already exists
+            if (Instance == null)
+                //if not, set instance to this
+                Instance = this;
+            //If instance already exists and it's not this:
+            else if (Instance != this)
+                //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
+                Destroy(gameObject);
+            //Sets this to not be destroyed when reloading scene
+            DontDestroyOnLoad(gameObject);
+        }
+
         //SetupScene initializes our level and calls the previous functions to lay out the game board
         public void SetupScene(int level)
         {
+            _columns = Random.Range(6, 10);
+            _rows = Random.Range(6, 10);
+
+            InitialiseFog();
+
             //Creates the outer walls and floor.
             BoardSetup();
 
@@ -54,21 +88,46 @@ namespace Scripts
             InitialiseList();
 
             //Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
-            LayoutObjectAtRandom(wallTiles, _wallCount.Minimum, _wallCount.Maximum);
+            LayoutObjectAtRandom(wallTiles, _wallCount.Minimum, _wallCount.Maximum, new GameObject("Walls").transform);
 
             //Instantiate a random number of food tiles based on minimum and maximum, at randomized positions.
-            LayoutObjectAtRandom(foodTiles, _foodCount.Minimum, _foodCount.Maximum);
+            LayoutObjectAtRandom(foodTiles, _foodCount.Minimum, _foodCount.Maximum, new GameObject("Foods").transform);
 
             //Determine number of enemies based on current level number, based on a logarithmic progression
             var enemyCount = (int) Math.Log(level, 2f);
 
             //Instantiate a random number of enemies based on minimum and maximum, at randomized positions.
-            LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount);
+            LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount, new GameObject("Enemies").transform);
 
             //Instantiate the exit tile in the upper right hand corner of our game board
             //Instantiate(exit, new Vector3(columns - 1, rows - 1, 0f), Quaternion.identity);
             //Instantiate the exit tile in random place of our game board
-            LayoutObjectAtRandom(new[] {exit}, 1, 1);
+            LayoutObjectAtRandom(new[] {exit}, 1, 1, new GameObject("Exit").transform);
+        }
+
+        private void InitialiseFog()
+        {
+            _fogParent = new GameObject("Fogs");
+            _fogs = new List<GameObject>((_columns + 2) * (_rows + 2));
+
+            for (var x = -1; x < _columns + 1; x++)
+            {
+                for (var y = -1; y < _rows + 1; y++)
+                {
+                    _fogs.Add(Instantiate(fog, new Vector3(x, y, -1), Quaternion.identity, _fogParent.transform));
+                }
+            }
+        }
+
+        public void ClearFogAround(Vector3 position)
+        {
+            foreach (var item in _fogs)
+            {
+                var fogPosition = item.transform.position;
+                var dx = Mathf.Abs(position.x - fogPosition.x);
+                var dy = Mathf.Abs(position.y - fogPosition.y);
+                item.SetActive(dx + dy > VisibleRange);
+            }
         }
 
         /// <summary>
@@ -76,29 +135,27 @@ namespace Scripts
         /// </summary>
         private void BoardSetup()
         {
-            _columns = Random.Range(6, 10);
-            _rows = Random.Range(6, 10);
-
             //Instantiate Board and set boardHolder to its transform.
             _boardHolder = new GameObject("Board").transform;
 
             //Loop along x axis, starting from -1 (to fill corner) with floor or outer wall edge tiles.
-            for (var x = -1;
-                x < _columns + 1;
-                x++) //Loop along y axis, starting from -1 to place floor or outer wall tiles.                
-            for (var y = -1; y < _rows + 1; y++)
+            for (var x = -1; x < _columns + 1; x++)
             {
-                //Choose a random tile from our array of floor tile prefabs and prepare to instantiate it.
-                var toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
+                //Loop along y axis, starting from -1 to place floor or outer wall tiles. 
+                for (var y = -1; y < _rows + 1; y++)
+                {
+                    //Choose a random tile from our array of floor tile prefabs and prepare to instantiate it.
+                    var toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
 
-                //Check if we current position is at board edge, if so choose a random outer wall prefab from our array of outer wall tiles.
-                if (x == -1 || x == _columns || y == -1 || y == _rows)
-                    toInstantiate = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
+                    //Check if we current position is at board edge, if so choose a random outer wall prefab from our array of outer wall tiles.
+                    if (x == -1 || x == _columns || y == -1 || y == _rows)
+                        toInstantiate = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
 
-                //Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3
-                //corresponding to current grid position in loop, cast it to GameObject. Set the parent of our newly
-                //instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
-                Instantiate(toInstantiate, new Vector3(x, y, 0f), Quaternion.identity, _boardHolder);
+                    //Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3
+                    //corresponding to current grid position in loop, cast it to GameObject. Set the parent of our newly
+                    //instantiated object instance to boardHolder, this is just organizational to avoid cluttering hierarchy.
+                    Instantiate(toInstantiate, new Vector3(x, y), Quaternion.identity, _boardHolder);
+                }
             }
         }
 
@@ -111,11 +168,15 @@ namespace Scripts
             _gridPositions.Clear();
 
             //Loop through x axis (columns).
-            for (var x = 1; x < _columns - 1; x++) //Within each column, loop through y axis (rows).
-            for (var y = 1;
-                y < _rows - 1;
-                y++) //At each index add a new Vector3 to our list with the x and y coordinates of that position.
-                _gridPositions.Add(new Vector3(x, y, 0f));
+            for (var x = 1; x < _columns - 1; x++)
+            {
+                //Within each column, loop through y axis (rows).
+                for (var y = 1; y < _rows - 1; y++)
+                {
+                    //At each index add a new Vector3 to our list with the x and y coordinates of that position.
+                    _gridPositions.Add(new Vector3(x, y, 0f));
+                }
+            }
         }
 
         /// <summary>
@@ -125,7 +186,9 @@ namespace Scripts
         /// <param name="tileArray">Objects to be setup location</param>
         /// <param name="minimum">Minimum of objects</param>
         /// <param name="maximum">Maximum of objects</param>
-        private void LayoutObjectAtRandom([NotNull] IReadOnlyList<GameObject> tileArray, int minimum, int maximum)
+        /// <param name="parent">The parent of objects</param>
+        private void LayoutObjectAtRandom([NotNull] IReadOnlyList<GameObject> tileArray, int minimum, int maximum,
+            Transform parent)
         {
             //Choose a random number of objects to instantiate within the minimum and maximum limits
             var objectCount = Random.Range(minimum, maximum + 1);
@@ -140,7 +203,7 @@ namespace Scripts
                 var tileChoice = tileArray[Random.Range(0, tileArray.Count)];
 
                 //Instantiate tileChoice at the position returned by RandomPosition with no change in rotation
-                Instantiate(tileChoice, randomPosition, Quaternion.identity);
+                Instantiate(tileChoice, randomPosition, Quaternion.identity, parent);
             }
         }
 

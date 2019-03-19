@@ -4,14 +4,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Scripts {
-    public class GameManager : MonoBehaviour {
+namespace Scripts
+{
+    public class GameManager : MonoBehaviour
+    {
         private const float TurnDelay = 0.1f; //Delay between each Player turn.
 
         public static GameManager
             Instance; //Static instance of GameManager which allows it to be accessed by any other script.
 
-        private BoardManager _boardScript; //Store a reference to our BoardManager which will set up the level.
 
         private bool
             _doingSetup = true; //Boolean to check if we're setting up board, prevent Player from moving during setup.
@@ -30,7 +31,8 @@ namespace Scripts {
         public bool playersTurn = true; //Boolean to check if it's players turn, hidden in inspector but public.
 
         //Awake is always called before any Start functions
-        private void Awake() {
+        private void Awake()
+        {
             //Check if instance already exists
             if (Instance == null)
 
@@ -49,8 +51,6 @@ namespace Scripts {
             //Assign enemies to a new List of Enemy objects.
             _enemies = new List<Enemy>();
 
-            //Get a component reference to the attached BoardManager script
-            _boardScript = GetComponent<BoardManager>();
 
             //Call the InitGame function to initialize the first level 
             InitGame();
@@ -59,20 +59,23 @@ namespace Scripts {
         //this is called only once, and the parameter tell it to be called only after the scene was loaded
         //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
         [RuntimeInitializeOnLoadMethod]
-        public static void CallbackInitialization() {
+        public static void CallbackInitialization()
+        {
             //register the callback to be called every time the scene is loaded
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         //This is called each time a scene is loaded.
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
             Instance._level++;
             Instance.InitGame();
         }
 
 
         //Initializes the game for each level.
-        private void InitGame() {
+        private void InitGame()
+        {
             //While doingSetup is true the player can't move, prevent player from moving while title card is up.
             _doingSetup = true;
 
@@ -94,13 +97,16 @@ namespace Scripts {
             //Clear any Enemy objects in our List to prepare for next level.
             _enemies.Clear();
 
+            //Get a component reference to the attached BoardManager script
+            var boardManager = BoardManager.Instance;
             //Call the SetupScene function of the BoardManager script, pass it current level number.
-            _boardScript.SetupScene(_level);
+            boardManager.SetupScene(_level);
+            boardManager.ClearFogAround(GameObject.Find("Player").transform.position);
         }
 
-
         //Hides black image used between levels
-        private void HideLevelImage() {
+        private void HideLevelImage()
+        {
             //Disable the levelImage gameObject.
             _levelImage.SetActive(false);
 
@@ -109,7 +115,8 @@ namespace Scripts {
         }
 
         //Update is called every frame.
-        private void Update() {
+        private void Update()
+        {
             //Check that playersTurn or enemiesMoving or doingSetup are not currently true.
             if (playersTurn || _enemiesMoving || _doingSetup)
 
@@ -121,14 +128,16 @@ namespace Scripts {
         }
 
         //Call this to add the passed in Enemy to the List of Enemy objects.
-        public void AddEnemyToList(Enemy script) {
+        public void AddEnemyToList(Enemy script)
+        {
             //Add Enemy to List enemies.
             _enemies.Add(script);
         }
 
 
         //GameOver is called when the player reaches 0 food points
-        public void GameOver() {
+        public void GameOver()
+        {
             //Set levelText to display number of levels passed and game over message
             _levelText.text = "After " + _level + " days, you starved.";
 
@@ -140,7 +149,8 @@ namespace Scripts {
         }
 
         //Coroutine to move enemies in sequence.
-        private IEnumerator MoveEnemies() {
+        private IEnumerator MoveEnemies()
+        {
             //While enemiesMoving is true player is unable to move.
             _enemiesMoving = true;
 
@@ -151,7 +161,8 @@ namespace Scripts {
             if (_enemies.Count == 0) yield return new WaitForSeconds(TurnDelay);
 
             //Loop through List of Enemy objects.
-            foreach (var enemy in _enemies) {
+            foreach (var enemy in _enemies)
+            {
                 if (enemy.gameObject.activeSelf) enemy.MoveEnemy();
 
                 //Wait for Enemy's moveTime before moving next Enemy, 

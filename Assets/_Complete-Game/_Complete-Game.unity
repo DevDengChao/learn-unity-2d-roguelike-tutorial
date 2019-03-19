@@ -510,6 +510,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 133658, guid: 1ca8c6e960c494bbd937610290f80d1b, type: 3}
   soundManager: {fileID: 109316, guid: 76cd81135280f4ad6a4fa80f6422aea2, type: 3}
+  boardManager: {fileID: 0}
 --- !u!1 &1410265689
 GameObject:
   m_ObjectHideFlags: 0
