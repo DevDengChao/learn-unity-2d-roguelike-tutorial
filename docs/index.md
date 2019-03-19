@@ -6,6 +6,11 @@
 官方教程中提供的视频来自 YouTube, 国内有搬运工已经把整套视频搬到 
 [Bilibili](https://www.bilibili.com/video/av5480978) 了.
 
+<video preload="auto">
+    <source src="video/2019-03-19-15-49-54.mp4" type="video/mp4">
+    <a href="video/2019-03-19-15-49-54.mp4">预览.mp4</a>
+</video>
+
 ## Rules
 
 通过试玩, 我发现了这个小游戏的一些基础的游戏规则:
@@ -439,3 +444,5 @@ protected override void OnCantMove(MonoBehavior component) {
 恢复远处的迷雾效果.
 0. 使 `BoardManager` 单例化, 以便能够跨组件调用.
 0. `MovingObject` 添加移动结束回调, 以便玩家移动成功时能触发战争迷雾的动态效果.
+
+[回到顶部](#learn-2d-roguelike-tutorial)
