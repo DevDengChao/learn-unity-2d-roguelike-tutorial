@@ -210,6 +210,8 @@ namespace Scripts
 
                     //Disable the food object the player collided with.
                     other.gameObject.SetActive(false);
+                    if (randomFoodPoint < 0)
+                        CheckIfGameOver();
                     break;
                 //Check if the tag of the trigger collided with is Soda.
                 case "Soda":
@@ -225,6 +227,8 @@ namespace Scripts
 
                     //Disable the soda object the player collided with.
                     other.gameObject.SetActive(false);
+                    if (randomSodaPoint < 0)
+                        CheckIfGameOver();
                     break;
                 default:
                     print(other);
