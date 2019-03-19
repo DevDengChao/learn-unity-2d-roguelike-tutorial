@@ -199,7 +199,7 @@ namespace Scripts
                 //Check if the tag of the trigger collided with is Food.
                 case "Food":
                     //Add pointsPerFood to the players current food total.
-                    var randomFoodPoint = Random.Range(-pointsPerFood, pointsPerFood);
+                    var randomFoodPoint = Random.Range(-pointsPerFood, pointsPerFood) + pointsPerFood / 2;
                     _food += randomFoodPoint;
 
                     //Update foodText to represent current total and notify player that they gained points
@@ -216,7 +216,7 @@ namespace Scripts
                 //Check if the tag of the trigger collided with is Soda.
                 case "Soda":
                     //Add pointsPerSoda to players food points total
-                    var randomSodaPoint = Random.Range(-pointsPerSoda, pointsPerSoda);
+                    var randomSodaPoint = Random.Range(-pointsPerSoda, pointsPerSoda) + pointsPerSoda / 2;
                     _food += randomSodaPoint;
 
                     //Update foodText to represent current total and notify player that they gained points
