@@ -1,4 +1,4 @@
-# 2D Roguelike tutorial
+# Learn 2D Roguelike tutorial
 
 这篇文章是我通过 [2D Roguelike tutorial](https://unity3d.com/learn/tutorials/s/2d-roguelike-tutorial) 
 项目在学习 Unity 的使用时留下的记录. 
@@ -63,15 +63,15 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 后来测试发现这些 `*.meta` 文件记录着 `Inspector` 面板中的数据, 是 Unity
 的各种组件之间的依赖关系的持久化文件.
 
-## _Complete-Game
+## Learn by reading
 
-该目录下包含整个教程完整的示例, 是我学习这个项目的主战场.
+_Complete-Game 目录下包含整个教程完整的示例, 是我学习这个项目的主战场.
 
 ### Readme.asset
 
-该文件中记录了 [TutorialInfo/Scripts/Readme.cs](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/TutorialInfo/Scripts/Readme.cs)
+该文件中记录了 [TutorialInfo/Scripts/Readme.cs](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/TutorialInfo/Scripts/Readme.cs)
 类对应的元数据. 进一步探索发现这个资产的 `Inspector` 界面以及顶部工具栏里的 `Tutorial` 菜单都是通过
-[TutorialInfo/Scripts/Editor/ReadmeEditor.cs](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
+[TutorialInfo/Scripts/Editor/ReadmeEditor.cs](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs)
 控制的.
 
 到处改一改, 发现 Unity 插件开发相当的敏捷, 不像 IDEA 的插件, 
@@ -80,13 +80,13 @@ Settings->Editor` 中的 `Version control mode` 改为 `Visible Meta Files` 以�
 ### Main.unity
 
 主场景. 仔细观察了一下发现在 Camera 上挂载着一个
-[Loader](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Loader.cs)
+[Loader](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/Loader.cs)
 脚本. 
 
 脚本内容很简单, 通过 `Inspector` 中设置的属性实例化 
-[GameManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/GameManager.cs)
+[GameManager](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/GameManager.cs)
 和 
-[SoundManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/SoundManager.cs)
+[SoundManager](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/SoundManager.cs)
 对象.
 
 ### SoundManager.cs
@@ -114,9 +114,9 @@ private void Awake() {
 
 ### GameManger.cs
 
-游戏管理器. 在 `Awake` 中定义了 [Enemy](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Enemy.cs) 
+游戏管理器. 在 `Awake` 中定义了 [Enemy](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/Enemy.cs) 
 集合, 并通过 `GetComponent<>()` 获取到了被托管的 
-[BoardManager](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/BoardManager.cs)
+[BoardManager](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/BoardManager.cs)
 对象完成成员变量的初始化. 
 
 ```c#
@@ -129,7 +129,7 @@ _boardScript = GetComponent<BoardManager>();
 
 在生命周期 `Update` 中, 如果不需要等待玩家移动, 其他敌人移动或者过场的话, 
 则尝试开启协程移动每一个 `Enemy` 对象. 全部 `Enemy` 移动完成后, 允许 
-[Player](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs)
+[Player](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/Player.cs)
 移动.
 
 ### BoardManager.cs
@@ -137,7 +137,7 @@ _boardScript = GetComponent<BoardManager>();
 关卡管理器. 没有采用单例设计, 也没有实现生命周期方法. 
 
 对外仅暴露部分成员属性用于依赖注入, 以及 `SetupScene(int)` 方法用于实例化每一级关卡的外墙,
-地板, 内墙 ([Wall](https://github.com/XieEDeHeiShou/tutorial-2d-roguelike/blob/master/Assets/_Complete-Game/Scripts/Player.cs)),
+地板, 内墙 ([Wall](https://github.com/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial/blob/master/Assets/_Complete-Game/Scripts/Player.cs)),
 食物, 苏打, 敌人以及出口.
 
 具体的实例化方式则是调用 `Instantiate(...)` 方法, 将指定的预设物实例化在场景中.
