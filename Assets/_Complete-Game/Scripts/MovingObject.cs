@@ -75,6 +75,15 @@ namespace Scripts
                 //Return and loop until sqrRemainingDistance is close enough to zero to end the function
                 yield return null;
             }
+
+            OnSmoothMoveFinish();
+        }
+
+        /// <summary>
+        ///     平滑移动结束回调
+        /// </summary>
+        protected virtual void OnSmoothMoveFinish()
+        {
         }
 
 

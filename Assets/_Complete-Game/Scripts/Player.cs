@@ -95,6 +95,11 @@ namespace Scripts
             GameManager.Instance.playersTurn = false;
         }
 
+        protected override void OnSmoothMoveFinish()
+        {
+            BoardManager.Instance.ClearFogAround(transform.position);
+        }
+
         private static void HandleInput(out int horizontal, out int vertical)
         {
             //Check if we are running either in the Unity editor or in a standalone build.
