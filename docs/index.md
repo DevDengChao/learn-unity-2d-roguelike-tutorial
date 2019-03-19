@@ -390,3 +390,18 @@ private void OnTriggerEnter2D(Collider2D other) {
     }
 }                
 ```
+
+### Superior enemy
+
+精英怪都是会拆墙的.
+
+```c#
+protected override void OnCantMove(Component component) {
+    switch (component) {
+        case Wall wall:
+            wall.DamageWall(Damage);
+            break;
+    }
+    ...
+}
+```
