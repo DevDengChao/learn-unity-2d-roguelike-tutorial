@@ -20,6 +20,7 @@
 0. 障碍物有 3 点生命值, 被玩家攻击第一次以后会更换材质, 被摧毁后允许玩家和敌人通过.
 0. 出口固定在右上角位置.
 0. 镜头固定在(x=3.5,y=3.5,z=-10)的位置.
+0. 地图全开, 没有迷雾.
 
 ## File tree
 
@@ -418,3 +419,9 @@ protected override void OnCantMove(MonoBehavior component) {
     ...
 }
 ```
+
+### Main role
+
+镜头默认位于 (x=3.5,y=3.5,z=-10) 位置, 在地图尺寸随机的情况下, 有时候会看不全.
+要使镜头跟随玩家的话, 需要在 `Hierarchy` 面板中将 `MainCamera` 移动到 `Player`
+对象内部, 并将 `MainCamera` 的 position 调整为 (x=0,y=0,z=-10), 确保玩家位于镜头中央.
