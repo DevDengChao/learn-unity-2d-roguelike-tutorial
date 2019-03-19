@@ -88,7 +88,7 @@ namespace Scripts {
 
         //OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
         //and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
-        protected override void OnCantMove(Component component) {
+        protected override void OnCantMove(MonoBehaviour component) {
             switch (component) {
                 //Declare hitPlayer and set it to equal the encountered component.
                 //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of food points to be subtracted.

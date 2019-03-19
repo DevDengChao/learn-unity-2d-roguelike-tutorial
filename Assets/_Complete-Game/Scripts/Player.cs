@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 //Allows us to use UI.
 
-namespace Scripts {
+namespace Scripts
+{
     //Player inherits from MovingObject, our base class for objects that can move, Enemy also inherits from this.
-    public class Player : MovingObject {
+    public class Player : MovingObject
+    {
         public float restartLevelDelay = 1f; //Delay time in seconds to restart level.
         public int pointsPerFood = 10; //Number of points to add to player food points when picking up a food object.
         public int pointsPerSoda = 20; //Number of points to add to player food points when picking up a soda object.
@@ -34,7 +36,8 @@ namespace Scripts {
 
 
         //Start overrides the Start function of MovingObject
-        protected override void Start() {
+        protected override void Start()
+        {
             //Get a component reference to the Player's animator component
             _animator = GetComponent<Animator>();
 
@@ -50,13 +53,15 @@ namespace Scripts {
 
 
         //This function is called when the behaviour becomes disabled or inactive.
-        private void OnDisable() {
+        private void OnDisable()
+        {
             //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
             GameManager.Instance.playerFoodPoints = _food;
         }
 
 
-        private void Update() {
+        private void Update()
+        {
             //If it's not the player's turn, exit the function.
             if (!GameManager.Instance.playersTurn) return;
 
@@ -68,7 +73,8 @@ namespace Scripts {
 
         //AttemptMove overrides the AttemptMove function in the base class MovingObject
         //AttemptMove takes a generic parameter T which for Player will be of the type Wall, it also takes integers for x and y direction to move in.
-        private new void AttemptMove(int xDir, int yDir) {
+        private new void AttemptMove(int xDir, int yDir)
+        {
             //Every time player moves, subtract from food points total.
             _food--;
 
@@ -80,7 +86,7 @@ namespace Scripts {
 
             //Hit allows us to reference the result of the Linecast done in Move.
             //If Move returns true, meaning Player was able to move into an empty space.
-            if (Move(xDir, yDir, out _ /*hit*/)) SoundManager.Instance.RandomizeSfx(moveSound1, moveSound2);
+            if (Move(xDir, yDir)) SoundManager.Instance.RandomizeSfx(moveSound1, moveSound2);
 
             //Since the player has moved and lost food points, check if the game has ended.
             CheckIfGameOver();
@@ -89,7 +95,8 @@ namespace Scripts {
             GameManager.Instance.playersTurn = false;
         }
 
-        private static void HandleInput(out int horizontal, out int vertical) {
+        private static void HandleInput(out int horizontal, out int vertical)
+        {
             //Check if we are running either in the Unity editor or in a standalone build.
 #if UNITY_STANDALONE || UNITY_WEBPLAYER
             //Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
@@ -142,11 +149,12 @@ namespace Scripts {
 #endif //End of mobile platform dependent compilation section started above with #elif
         }
 
-
         //OnCantMove overrides the abstract function OnCantMove in MovingObject.
         //It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-        protected override void OnCantMove(Component component) {
-            switch (component) {
+        protected override void OnCantMove(MonoBehaviour component)
+        {
+            switch (component)
+            {
                 case Wall wall:
                     print("Clear my path.");
                     //Set hitWall to equal the component passed in as a parameter.
@@ -168,11 +176,14 @@ namespace Scripts {
 
 
         //OnTriggerEnter2D is sent when another object enters a trigger collider attached to this object (2D physics only).
-        private void OnTriggerEnter2D(Collider2D other) {
-            switch (other.tag) {
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            switch (other.tag)
+            {
                 //Check if the tag of the trigger collided with is Exit.
                 case "Exit":
-                    if (_food > 0) {
+                    if (_food > 0)
+                    {
                         //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
                         Invoke(nameof(Restart), restartLevelDelay);
                         //Disable the player object since level is over.
@@ -218,7 +229,8 @@ namespace Scripts {
 
 
         //Restart reloads the scene when called.
-        private void Restart() {
+        private void Restart()
+        {
             //Load the last scene loaded, in this case Main, the only scene in the game. And we load it in "Single" mode so it replace the existing one
             //and not load all the scene object in the current scene.
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
@@ -227,7 +239,8 @@ namespace Scripts {
 
         //LoseFood is called when an enemy attacks the player.
         //It takes a parameter loss which specifies how many points to lose.
-        public void LoseFood(int loss) {
+        public void LoseFood(int loss)
+        {
             //Set the trigger for the player animator to transition to the playerHit animation.
             _animator.SetTrigger(PlayerHit);
 
@@ -243,7 +256,8 @@ namespace Scripts {
 
 
         //CheckIfGameOver checks if the player is out of food points and if so, ends the game.
-        private void CheckIfGameOver() {
+        private void CheckIfGameOver()
+        {
             //Check if food point total is less than or equal to zero.
             if (_food > 0) return;
             //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.

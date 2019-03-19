@@ -395,8 +395,21 @@ private void OnTriggerEnter2D(Collider2D other) {
 
 精英怪都是会拆墙的.
 
+为了让玩家和敌人能够攻击不同类型的对象, 需要调用 `AttemptMove<>(int,int)` 方法, 
+并传入不同的泛型:
+
 ```c#
-protected override void OnCantMove(Component component) {
+...
+base.AttemptMove<Wall>(xDir, yDir);
+base.AttemptMove<Enemy>(xDir, yDir);
+...
+```
+
+但这样写看起来很不简洁, 而且对象会移动多次. 因此需要把泛型从 `AttemptMove<>(int,int)` 
+和 `OnCannotMove<T>(T) where T : MonoBehavior` 中移除.
+
+```c#
+protected override void OnCantMove(MonoBehavior component) {
     switch (component) {
         case Wall wall:
             wall.DamageWall(Damage);
