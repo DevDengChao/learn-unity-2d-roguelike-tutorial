@@ -425,3 +425,17 @@ protected override void OnCantMove(MonoBehavior component) {
 镜头默认位于 (x=3.5,y=3.5,z=-10) 位置, 在地图尺寸随机的情况下, 有时候会看不全.
 要使镜头跟随玩家的话, 需要在 `Hierarchy` 面板中将 `MainCamera` 移动到 `Player`
 对象内部, 并将 `MainCamera` 的 position 调整为 (x=0,y=0,z=-10), 确保玩家位于镜头中央.
+
+### Fog of war
+
+战争迷雾的缺失, 使得游戏的探索性降低为 0, 玩家只需要在开始行动前规划好路径即可. 
+
+要将战争迷雾这一特性加入游戏, 需要改造 `BoardManager` 和 `GameManager`:
+
+0. 添加 `Fog` 预设物以及贴图, 并调整 `Sorting layer` 为 `Units`, 确保战争迷雾与玩家同层.
+0. 添加 `List<GameObject>` 到 `BoardManager`, 用于存放战争迷雾实例.
+0. 为 `BoardManager` 添加方法 `public void ClearFogAround(Vector3)`, 
+通过控制 `GameObject` 的 `active` 属性实现迷雾的显示隐藏, 并延伸到移除指定位置近处的迷雾效果, 
+恢复远处的迷雾效果.
+0. 使 `BoardManager` 单例化, 以便能够跨组件调用.
+0. `MovingObject` 添加移动结束回调, 以便玩家移动成功时能触发战争迷雾的动态效果.
