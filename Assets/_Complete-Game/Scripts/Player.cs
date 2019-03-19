@@ -171,7 +171,6 @@ namespace Scripts {
         private void OnTriggerEnter2D(Collider2D other) {
             switch (other.tag) {
                 //Check if the tag of the trigger collided with is Exit.
-                //Check if the tag of the trigger collided with is Food.
                 case "Exit":
                     if (_food > 0) {
                         //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
@@ -181,7 +180,7 @@ namespace Scripts {
                     }
 
                     break;
-                //Check if the tag of the trigger collided with is Soda.
+                //Check if the tag of the trigger collided with is Food.
                 case "Food":
                     //Add pointsPerFood to the players current food total.
                     var randomFoodPoint = Random.Range(-pointsPerFood, pointsPerFood);
@@ -196,6 +195,7 @@ namespace Scripts {
                     //Disable the food object the player collided with.
                     other.gameObject.SetActive(false);
                     break;
+                //Check if the tag of the trigger collided with is Soda.
                 case "Soda":
                     //Add pointsPerSoda to players food points total
                     var randomSodaPoint = Random.Range(-pointsPerSoda, pointsPerSoda);

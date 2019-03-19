@@ -365,9 +365,28 @@ private void OnTriggerEnter2D (Collider2D other)
 
 ### Resize movable area from 8x8 to random size
 
-想要调整地图尺寸很简单, 在 BoardManager 中修改 _columns 和 _rows 成员变量就行了.
+想要调整地图尺寸很简单, 在 `BoardManager` 中修改 `_columns` 和 `_rows` 成员变量就行了.
 
 ```c#
-_columns = Random.Range(6, 10);
-_rows = Random.Range(6, 10);
+private void BoardSetup(){
+    _columns = Random.Range(6, 10);
+    _rows = Random.Range(6, 10);
+    ...
+}
+```
+
+### Bad apple 
+
+地牢里的水果和饮料总是那么的新鲜, 看起来很诡异, 我决定加入一些烂苹果和腐败的饮料混在其中.
+
+```c#
+private void OnTriggerEnter2D(Collider2D other) {
+    switch (other.tag) {
+        case "Food":
+            // simulate bad apple
+            var randomFoodPoint = Random.Range(-pointsPerFood, pointsPerFood);
+            _food += randomFoodPoint;
+            ...
+    }
+}                
 ```
