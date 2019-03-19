@@ -6,7 +6,7 @@
 官方教程中提供的视频来自 YouTube, 国内有搬运工已经把整套视频搬到 
 [Bilibili](https://www.bilibili.com/video/av5480978) 了.
 
-<video preload="auto" style="width:100%" controls="controls">
+<video preload="auto" style="width:100%" controls="controls" autoplay="autoplay">
     <source src="video/2019-03-19-15-49-54.mp4" type="video/mp4">
     <a href="video/2019-03-19-15-49-54.mp4">预览.mp4</a>
 </video>
