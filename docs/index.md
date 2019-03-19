@@ -18,6 +18,8 @@
 0. 玩家 (player) 初始生命值 (foodPoint) 为 100, 碰到水果提升 10 点, 碰到饮料
 提升 20 点, 被敌人攻击时, 根据敌人类型丢失 10 点或 20 点.
 0. 障碍物有 3 点生命值, 被玩家攻击第一次以后会更换材质, 被摧毁后允许玩家和敌人通过.
+0. 出口固定在右上角位置.
+0. 镜头固定在(x=3.5,y=3.5,z=-10)的位置.
 
 ## File tree
 
@@ -359,4 +361,13 @@ private void OnTriggerEnter2D (Collider2D other)
 ## Learn by modifying
 
 至此, Unity 官方教程 2d-roguelike-tutorial 分析完毕, 接下来就是到处改东西, 
-看看会不会崩了 23333.
+看看会不会崩了 :).
+
+### Resize movable area from 8x8 to random size
+
+想要调整地图尺寸很简单, 在 BoardManager 中修改 _columns 和 _rows 成员变量就行了.
+
+```c#
+_columns = Random.Range(6, 10);
+_rows = Random.Range(6, 10);
+```

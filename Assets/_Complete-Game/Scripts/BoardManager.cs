@@ -4,17 +4,19 @@ using JetBrains.Annotations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Scripts {
-    public class BoardManager : MonoBehaviour {
+namespace Scripts
+{
+    public class BoardManager : MonoBehaviour
+    {
         /// <summary>
         ///     Number of columns in our game board.
         /// </summary>
-        private const int Columns = 8;
+        private int _columns;
 
         /// <summary>
         ///     Number of rows in our game board.
         /// </summary>
-        private const int Rows = Columns;
+        private int _rows;
 
         /// <summary>
         ///     Lower and upper limit for our random number of food items per level.
@@ -43,7 +45,8 @@ namespace Scripts {
         public GameObject[] wallTiles; //Array of wall prefabs.
 
         //SetupScene initializes our level and calls the previous functions to lay out the game board
-        public void SetupScene(int level) {
+        public void SetupScene(int level)
+        {
             //Creates the outer walls and floor.
             BoardSetup();
 
@@ -71,20 +74,25 @@ namespace Scripts {
         /// <summary>
         ///     Sets up the outer walls and floor (background) of the game board.
         /// </summary>
-        private void BoardSetup() {
+        private void BoardSetup()
+        {
+            _columns = Random.Range(6, 10);
+            _rows = Random.Range(6, 10);
+
             //Instantiate Board and set boardHolder to its transform.
             _boardHolder = new GameObject("Board").transform;
 
             //Loop along x axis, starting from -1 (to fill corner) with floor or outer wall edge tiles.
             for (var x = -1;
-                x < Columns + 1;
+                x < _columns + 1;
                 x++) //Loop along y axis, starting from -1 to place floor or outer wall tiles.                
-            for (var y = -1; y < Rows + 1; y++) {
+            for (var y = -1; y < _rows + 1; y++)
+            {
                 //Choose a random tile from our array of floor tile prefabs and prepare to instantiate it.
                 var toInstantiate = floorTiles[Random.Range(0, floorTiles.Length)];
 
                 //Check if we current position is at board edge, if so choose a random outer wall prefab from our array of outer wall tiles.
-                if (x == -1 || x == Columns || y == -1 || y == Rows)
+                if (x == -1 || x == _columns || y == -1 || y == _rows)
                     toInstantiate = outerWallTiles[Random.Range(0, outerWallTiles.Length)];
 
                 //Instantiate the GameObject instance using the prefab chosen for toInstantiate at the Vector3
@@ -97,14 +105,15 @@ namespace Scripts {
         /// <summary>
         ///     Clears our list gridPositions and prepares it to generate a new board.
         /// </summary>
-        private void InitialiseList() {
+        private void InitialiseList()
+        {
             //Clear our list gridPositions.
             _gridPositions.Clear();
 
             //Loop through x axis (columns).
-            for (var x = 1; x < Columns - 1; x++) //Within each column, loop through y axis (rows).
+            for (var x = 1; x < _columns - 1; x++) //Within each column, loop through y axis (rows).
             for (var y = 1;
-                y < Rows - 1;
+                y < _rows - 1;
                 y++) //At each index add a new Vector3 to our list with the x and y coordinates of that position.
                 _gridPositions.Add(new Vector3(x, y, 0f));
         }
@@ -116,12 +125,14 @@ namespace Scripts {
         /// <param name="tileArray">Objects to be setup location</param>
         /// <param name="minimum">Minimum of objects</param>
         /// <param name="maximum">Maximum of objects</param>
-        private void LayoutObjectAtRandom([NotNull] IReadOnlyList<GameObject> tileArray, int minimum, int maximum) {
+        private void LayoutObjectAtRandom([NotNull] IReadOnlyList<GameObject> tileArray, int minimum, int maximum)
+        {
             //Choose a random number of objects to instantiate within the minimum and maximum limits
             var objectCount = Random.Range(minimum, maximum + 1);
 
             //Instantiate objects until the randomly chosen limit objectCount is reached
-            for (var i = 0; i < objectCount; i++) {
+            for (var i = 0; i < objectCount; i++)
+            {
                 //Choose a position for randomPosition by getting a random position from our list of available Vector3s stored in gridPosition
                 var randomPosition = RandomPosition();
 
@@ -137,7 +148,8 @@ namespace Scripts {
         ///     RandomPosition returns a random position from our list gridPositions.
         /// </summary>
         /// <returns>The random position in 3d</returns>
-        private Vector3 RandomPosition() {
+        private Vector3 RandomPosition()
+        {
             //Declare an integer randomIndex, set it's value to a random number between 0 and the count of items in our List gridPositions.
             var randomIndex = Random.Range(0, _gridPositions.Count);
 
@@ -154,12 +166,14 @@ namespace Scripts {
 
         // Using Serializable allows us to embed a class with sub properties in the inspector.
         [Serializable]
-        private class Count {
+        private class Count
+        {
             public readonly int Maximum; //Maximum value for our Count class.
             public readonly int Minimum; //Minimum value for our Count class.
 
             //Assignment constructor.
-            public Count(int min, int max) {
+            public Count(int min, int max)
+            {
                 Minimum = min;
                 Maximum = max;
             }
