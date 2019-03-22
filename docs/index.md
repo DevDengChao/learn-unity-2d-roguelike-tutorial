@@ -1,4 +1,8 @@
-# Learn 2D Roguelike tutorial
+# Learn 2D Roguelike tutorial 
+
+PV|Github
+--|------
+![View](http://hits.dwyl.io/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial.svg)|![View](http://hits.dwyl.io/XieEDeHeiShou/learn-unity-2d-roguelike-tutorial-github.svg)
 
 这篇文章是我通过 [2D Roguelike tutorial](https://unity3d.com/learn/tutorials/s/2d-roguelike-tutorial) 
 项目在学习 Unity 的使用时留下的记录. 
@@ -6,9 +10,11 @@
 官方教程中提供的视频来自 YouTube, 国内有搬运工已经把整套视频搬到 
 [Bilibili](https://www.bilibili.com/video/av5480978) 了.
 
+学习成果:
+
 <video preload="auto" style="width:100%" controls="controls" autoplay="autoplay">
     <source src="video/2019-03-19-15-49-54.mp4" type="video/mp4">
-    <a href="video/2019-03-19-15-49-54.mp4">预览.mp4</a>
+    <a href="video/2019-03-19-15-49-54.mp4">学习成果.mp4</a>
 </video>
 
 ## Rules
@@ -34,7 +40,7 @@
  ┣ Assets (资产目录, 存放源代码, 素材的地方, 应该被 VCS 管理)
  ┃ ┣ _Complete-Game (完整示例)
  ┃ ┃ ┣ Animation (动画示例)
- ┃ ┃ ┣ Prefabs (预制件示例)
+ ┃ ┃ ┣ Prefabs (预设物示例)
  ┃ ┃ ┣ Scenes (场景示例)
  ┃ ┃ ┣ Scripts (脚本示例)
  ┃ ┃ ┣ _Complete-Game.unity (完整示例的主场景)
